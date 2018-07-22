@@ -137,18 +137,18 @@ if __name__ == '__main__':
 
         old_V = V.copy()
 
-        while delta_U > 1:
-            new_V = update_V(old_V, U, X)
-            delta_V = l21_norm(new_V - V)
-            V = new_V
+        # while delta_U > 1:
+        new_V = update_V(old_V, U, X)
+        delta_V = l21_norm(new_V - V)
+        V = new_V
 
-            new_U = solve_U(X, V, old_V, gamma)
-            delta_U = l21_norm(U - new_U)
-            U = new_U
+        new_U = solve_U(X, V, old_V, gamma)
+        delta_U = l21_norm(U - new_U)
+        U = new_U
 
-            print('DELTA V', delta_V)
-            print('DELTA U', delta_U)
-            print('NMI', NMI(U))
+        print('DELTA V', delta_V)
+        print('DELTA U', delta_U)
+        print('NMI', NMI(U))
 
         # if delta_V < .1:
         #     print('Converged at step', t)
