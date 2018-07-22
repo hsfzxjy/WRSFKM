@@ -18,7 +18,7 @@ epsilon = 1e-3
 
 # Download t10k_* from http://yann.lecun.com/exdb/mnist/
 # Change to directory containing unzipped MNIST data
-mndata = mnist.MNIST('/data/science/MNIST/')
+mndata = mnist.MNIST('./MNIST/')
 
 
 def solve_huang_eq_24(u):
