@@ -79,8 +79,8 @@ def solve_U(x, v, old_v, gamma):
             h = W + (norm_v - norm_v_old) * (1 - epsilon * W)
             # h = welsch_func(l21_norm(xi - v, axis=1))
             h = (-h) / (2 * gamma)
-            # U[i, :] = solve_huang_eq_13(h)
-            U[i, :] = solve_huang_eq_13_new(h)
+            U[i, :] = solve_huang_eq_13(h)
+            # U[i, :] = solve_huang_eq_13_new(h)
 
     return U
 
