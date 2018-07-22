@@ -78,8 +78,8 @@ def solve_U(x, v, old_v, gamma):
             W = welsch_func(norm_v_old)
             h = W + (norm_v - norm_v_old) * (1 - epsilon * W)
             h = (-h) / (2 * gamma)
-            U[i, :] = solve_huang_eq_13(h)
-            # U[i, :] = solve_huang_eq_13_new(h)
+            # U[i, :] = solve_huang_eq_13(h)
+            U[i, :] = solve_huang_eq_13_new(h)
 
     return U
 
@@ -148,7 +148,6 @@ if __name__ == '__main__':
             print('DELTA V', delta_V)
             print('DELTA U', delta_U)
             print('NMI', NMI(U))
-            break
 
         # if delta_V < .1:
         #     print('Converged at step', t)
