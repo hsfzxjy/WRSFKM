@@ -73,10 +73,11 @@ def solve_U(x, v, old_v, gamma):
     with pymp.Parallel(mp.cpu_count()) as p:
         for i in p.range(N):
             xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
-            norm_v = l21_norm(xi - v, axis=1)
-            norm_v_old = l21_norm(xi - old_v, axis=1)
-            W = welsch_func(norm_v_old)
-            h = W + (norm_v - norm_v_old) * (1 - epsilon * W)
+            # norm_v = l21_norm(xi - v, axis=1)
+            # norm_v_old = l21_norm(xi - old_v, axis=1)
+            # W = welsch_func(norm_v_old)
+            # h = W + (norm_v - norm_v_old) * (1 - epsilon * W)
+            h = welsch_func(l21_norm(xi - v, axis=1))
             h = (-h) / (2 * gamma)
             # U[i, :] = solve_huang_eq_13(h)
             U[i, :] = solve_huang_eq_13_new(h)

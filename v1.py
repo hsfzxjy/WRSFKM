@@ -14,11 +14,11 @@ from numpy.linalg import norm as l21_norm
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi
 
 gamma = .005
-epsilon = 1e-3
+epsilon = 1e-5
 
 # Download t10k_* from http://yann.lecun.com/exdb/mnist/
 # Change to directory containing unzipped MNIST data
-mndata = mnist.MNIST('./MNIST/')
+mndata = mnist.MNIST('/data/science/MNIST/')
 
 
 def solve_huang_eq_24(u):
@@ -61,25 +61,15 @@ def welsch_func(x):
     return result
 
 
-from opti_u import solve as solve_huang_eq_13_new
-import pymp
-import multiprocessing as mp
+def solve_U(x, v, gamma):
 
+    U = np.zeros((N, C))
 
-def solve_U(x, v, old_v, gamma):
-
-    U = pymp.shared.array((N, C))
-
-    with pymp.Parallel(mp.cpu_count()) as p:
-        for i in p.range(N):
-            xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
-            norm_v = l21_norm(xi - v, axis=1)
-            norm_v_old = l21_norm(xi - old_v, axis=1)
-            W = welsch_func(norm_v_old)
-            h = W + (norm_v - norm_v_old) * (1 - epsilon * W)
-            h = (-h) / (2 * gamma)
-            U[i, :] = solve_huang_eq_13(h)
-            # U[i, :] = solve_huang_eq_13_new(h)
+    for i in range(N):
+        xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
+        h = welsch_func(l21_norm(xi - v, axis=1))
+        h = (-h) / (2 * gamma)
+        U[i, :] = solve_huang_eq_13(h)
 
     return U
 
@@ -97,9 +87,9 @@ def update_V(v, u, x):
     for k in range(C):
         denominator = W[:, k].sum()
 
-        # # Avoid division by zero
-        # if denominator == 0:
-        #     denominator = 1
+        # Avoid division by zero
+        if denominator == 0:
+            denominator = 1
 
         new_v[k, :] = W[:, k].reshape((1, N)) @ x / denominator
 
@@ -120,38 +110,36 @@ if __name__ == '__main__':
 
     t = 0
     V = np.random.random((C, ndim))
-    U = np.ones((size, C)) * .1 / (C - 1)
+    U = np.zeros((size, C))
 
     for i in range(size):
         xi = np.repeat(X[i, :].reshape((1, ndim)), C, axis=0)
-        U[i, np.argmin(l21_norm(xi - V, axis=1))] = .9
+        U[i, np.argmin(l21_norm(xi - V, axis=1))] = 1
 
     S = np.ones((size, C))
+
 
     while True:
         print('-------------')
         print('== t = ', t)
+        new_V = update_V(V, U, X)
+        delta_V = l21_norm(new_V - V)
+        V = new_V
+        print('DELTA', delta_V)
 
-        delta_U = 100
+        delta = 100
 
-        old_V = V.copy()
+        while delta > 1:
+            new_U = solve_U(X, V, gamma)
+            delta = l21_norm(U - new_U)
 
-        while delta_U > 1:
-            new_V = update_V(old_V, U, X)
-            delta_V = l21_norm(new_V - V)
-            V = new_V
-
-            new_U = solve_U(X, V, old_V, gamma)
-            delta_U = l21_norm(U - new_U)
             U = new_U
 
-            print('DELTA V', delta_V)
-            print('DELTA U', delta_U)
-            print('NMI', NMI(U))
+        print('NMI', NMI(U))
 
-        # if delta_V < .1:
-        #     print('Converged at step', t)
-        #     print('NMI', NMI(U))
-        #     break
+        if delta_V < 1e-1:
+            print('Converged at step', t)
+            print('NMI', NMI(U))
+            break
 
         t += 1
