@@ -14,7 +14,7 @@ from numpy.linalg import norm as l21_norm
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi
 
 gamma = .005
-epsilon = 30
+epsilon = 1
 
 # Download t10k_* from http://yann.lecun.com/exdb/mnist/
 # Change to directory containing unzipped MNIST data
@@ -103,52 +103,89 @@ def NMI(U):
 
 def search_U(S, X, V, gammas=(.005,)):
 
-    best_g, best_U, best_NMI = 0, 0, 0
-    for gamma in gammas:
-        U = solve_U(S, X, V, gamma)
-        result = NMI(U)
+    return solve_U(S, X, V, gammas[0])
 
-        if result > best_NMI:
-            best_g = gamma
-            best_U = U
-            best_NMI = result
+    # best_g, best_U, best_NMI = 0, 0, 0
+    # for gamma in gammas:
+    #     U = solve_U(S, X, V, gamma)
+    #     # result = NMI(U)
 
-    print(best_g, best_NMI)
+    #     # if result > best_NMI:
+    #     #     best_g = gamma
+    #     #     best_U = U
+    #     #     best_NMI = result
 
-    return best_U
+    # print(best_g, best_NMI)
 
-
-images, labels = mndata.load_testing()
-ndim = 784
-size = len(labels)
-C = 10
-X = np.array(images).reshape((size, ndim)) / 255
-
-t = 0
-V = np.random.random((C, ndim))
-U = np.zeros((size, C))
-
-for i in range(size):
-    xi = np.repeat(X[i, :].reshape((1, ndim)), C, axis=0)
-    U[i, np.argmax(l21_norm(xi - V, axis=1))] = 1
-
-S = np.ones((size, C))
+    # return best_U
 
 
-while True:
-    print('-------------')
-    print('== t = ', t)
-    new_U = search_U(S, X, V, (gamma,))
-    delta = l21_norm(U - new_U)
+ndim = size = C = 0
 
-    U = new_U
-    V = update_V(S, U, X)
-    S = update_S(X, V)
-    print('NMI', NMI(U))
 
-    print('DELTA', delta)
-    if delta < 1e-1:
-        print('Converged at step', t)
-        break
+def orig(X, U, V, error, gamma=gamma):
 
-    t += 1
+    global ndim, size, C
+
+    ndim = len(X[0])
+    size = len(X)
+    C = len(V)
+
+    S = np.ones((size, C))
+    t = 1
+
+    while True:
+        print('--- ORIG ---')
+        print('== t = ', t)
+        new_U = search_U(S, X, V, (gamma,))
+        delta = l21_norm(U - new_U)
+
+        U = new_U
+        V = update_V(S, U, X)
+        S = update_S(X, V)
+        # print('NMI', NMI(U))
+
+        print('DELTA', delta)
+        if delta < error and t != 1:
+            print('Converged at step', t)
+            break
+
+        t += 1
+
+    return U, V
+
+
+if __name__ == '__main__':
+    images, labels = mndata.load_testing()
+    ndim = 784
+    size = len(labels)
+    C = 10
+    X = np.array(images).reshape((size, ndim)) / 255
+
+    t = 0
+    V = np.random.random((C, ndim))
+    U = np.zeros((size, C))
+
+    for i in range(size):
+        xi = np.repeat(X[i, :].reshape((1, ndim)), C, axis=0)
+        U[i, np.argmax(l21_norm(xi - V, axis=1))] = 1
+
+    S = np.ones((size, C))
+
+    while True:
+        print('-------------')
+        print('== t = ', t)
+        new_U = search_U(S, X, V, (gamma,))
+        delta = l21_norm(U - new_U)
+
+        U = new_U
+        V = update_V(S, U, X)
+        S = update_S(X, V)
+        print('NMI', NMI(U))
+
+        print('DELTA', delta)
+        if delta < 1e-1:
+            print('Converged at step', t)
+            break
+
+        t += 1
