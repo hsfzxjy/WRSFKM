@@ -232,6 +232,7 @@ if __name__ == '__main__':
     if action == 'test':
         for i in range(200):
             U, V = init_uv(X)
+            print('testing', i)
             fn = 'v3_log/{}.log'.format(i)
             t1, nmi1 = run_new(U, V, fn)
             t2, nmi2 = run_old(U, V, fn)
