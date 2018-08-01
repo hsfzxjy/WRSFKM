@@ -141,6 +141,7 @@ def run_new(U, V, log_file_name):
 
     t = 0
 
+    global print
     old_print = print
     print = lambda *args, **kwargs: old_print(*args, **kwargs, file=log_file)  # noqa
 
@@ -179,6 +180,7 @@ def run_old(U, V, log_file_name):
     log_file = open(log_file_name + '.old', 'w')
 
     t = 0
+    global print
     old_print = print
     print = lambda *args, **kwargs: old_print(*args, **kwargs, file=log_file)  # noqa
 
