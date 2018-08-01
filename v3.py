@@ -172,9 +172,9 @@ def run_old(U, V, log_file_name):
     log_file = open(log_file_name + '.old', 'w')
 
     t = 0
-    global print
-    log = print
-    # log = lambda *args, **kwargs: print(*args, **kwargs, file=log_file)  # noqa
+    # global print
+    # log = print
+    log = lambda *args, **kwargs: print(*args, **kwargs, file=log_file)  # noqa
 
     while True:
         log('-------------')
