@@ -14,7 +14,7 @@ from numpy.linalg import norm as l21_norm
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi
 
 gamma = .001
-epsilon = 1
+epsilon = 1e-4
 
 # Download t10k_* from http://yann.lecun.com/exdb/mnist/
 # Change to directory containing unzipped MNIST data
@@ -69,9 +69,6 @@ import multiprocessing as mp
 # old_v deprecated
 def solve_U(x, v, old_v, gamma):
 
-    N = len(x)
-    C = len(v)
-    ndim = len(x[0])
     U = pymp.shared.array((N, C))
 
     with pymp.Parallel(mp.cpu_count()) as p:
@@ -91,9 +88,6 @@ def solve_U(x, v, old_v, gamma):
 
 def update_V(v, u, x):
 
-    N = len(x)
-    C = len(v)
-    ndim = len(x[0])
     W = np.zeros((N, C))
 
     for i in range(N):
@@ -121,8 +115,6 @@ def NMI(U):
 
 def init_uv(X):
 
-    N = len(X)
-
     V = _init_centroids(X, C, 'k-means++')
 
     # V = np.random.random((C, ndim))
@@ -141,13 +133,13 @@ def run_new(U, V, log_file_name):
 
     t = 0
 
-    global print
-    old_print = print
-    print = lambda *args, **kwargs: old_print(*args, **kwargs, file=log_file)  # noqa
+    # global log
+    # log = print
+    log = lambda *args, **kwargs: print(*args, **kwargs, file=log_file)  # noqa
 
     while True:
-        print('-------------')
-        print('== t = ', t)
+        log('-------------')
+        log('== t = ', t)
 
         delta_V = 100
 
@@ -155,18 +147,18 @@ def run_new(U, V, log_file_name):
             new_V = update_V(V, U, X)
             delta_V = l21_norm(new_V - V)
             V = new_V
-            print('DELTA V', delta_V)
+            log('DELTA V', delta_V)
 
         new_U = solve_U(X, V, V, gamma)
         delta_U = l21_norm(U - new_U)
         U = new_U
 
-        print('DELTA U', delta_U)
-        print('NMI', NMI(U))
+        log('DELTA U', delta_U)
+        log('NMI', NMI(U))
 
         if delta_U < 1e-1:
-            print('Converged at step', t)
-            print('NMI', NMI(U))
+            log('Converged at step', t)
+            log('NMI', NMI(U))
             break
 
         t += 1
@@ -181,30 +173,30 @@ def run_old(U, V, log_file_name):
 
     t = 0
     global print
-    old_print = print
-    print = lambda *args, **kwargs: old_print(*args, **kwargs, file=log_file)  # noqa
+    log = print
+    # log = lambda *args, **kwargs: print(*args, **kwargs, file=log_file)  # noqa
 
     while True:
-        print('-------------')
-        print('== t = ', t)
+        log('-------------')
+        log('== t = ', t)
 
         delta_V = 100
 
         new_V = update_V(V, U, X)
         delta_V = l21_norm(new_V - V)
         V = new_V
-        print('DELTA V', delta_V)
+        log('DELTA V', delta_V)
 
         new_U = solve_U(X, V, V, gamma)
         delta_U = l21_norm(U - new_U)
         U = new_U
 
-        print('DELTA U', delta_U)
-        print('NMI', NMI(U))
+        log('DELTA U', delta_U)
+        log('NMI', NMI(U))
 
         if delta_U < 1e-1:
-            print('Converged at step', t)
-            print('NMI', NMI(U))
+            log('Converged at step', t)
+            log('NMI', NMI(U))
             break
 
         t += 1
