@@ -12,6 +12,7 @@ import mnist
 import numpy as np
 from numpy.linalg import norm as l21_norm
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi
+from sklearn.cluster.k_means_ import _init_centroids
 
 gamma = .001
 epsilon = 1e-4
@@ -61,32 +62,30 @@ def welsch_func(x):
     return result
 
 
-from opti_u import solve as solve_huang_eq_13_new
+# from opti_u import solve as solve_huang_eq_13_new
 import pymp
 import multiprocessing as mp
 
 
-# old_v deprecated
-def solve_U(x, v, old_v, gamma):
+def solve_U(x, v, gamma):
+
+    N, C, ndim = len(x), len(v), len(x[0])
 
     U = pymp.shared.array((N, C))
 
     with pymp.Parallel(mp.cpu_count()) as p:
         for i in p.range(N):
             xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
-            # norm_v = l21_norm(xi - v, axis=1)
-            # norm_v_old = l21_norm(xi - old_v, axis=1)
-            # W = welsch_func(norm_v_old)
-            # h = W + (norm_v - norm_v_old) * (1 - epsilon * W)
             h = welsch_func(l21_norm(xi - v, axis=1))
             h = (-h) / (2 * gamma)
             U[i, :] = solve_huang_eq_13(h)
-            # U[i, :] = solve_huang_eq_13_new(h)
 
     return U
 
 
 def update_V(v, u, x):
+
+    N, C, ndim = len(x), len(v), len(x[0])  # noqa
 
     W = np.zeros((N, C))
 
@@ -99,47 +98,46 @@ def update_V(v, u, x):
     for k in range(C):
         denominator = W[:, k].sum()
 
-        # # Avoid division by zero
-        # if denominator == 0:
-        #     denominator = 1
-
         new_v[k, :] = W[:, k].reshape((1, N)) @ x / denominator
 
     return new_v
 
 
-def NMI(U):
+def NMI(U, labels):
 
     return nmi(labels, np.argmax(U, axis=1))
 
 
-def init_uv(X):
+def init_uv(X, C, *, method):
 
-    V = _init_centroids(X, C, 'k-means++')
+    N, ndim = len(X), len(X[0])
 
-    # V = np.random.random((C, ndim))
-    U = np.ones((size, C)) * .1 / (C - 1)
+    assert isinstance(method, str)
 
-    for i in range(size):
+    if method == 'random':
+        V = np.random.random((C, ndim))
+    else:
+        V = _init_centroids(X, C, method)
+
+    U = np.ones((N, C)) * .1 / (C - 1)
+
+    for i in range(N):
         xi = np.repeat(X[i, :].reshape((1, ndim)), C, axis=0)
         U[i, np.argmin(l21_norm(xi - V, axis=1))] = .9
 
     return U, V
 
 
-def run_new(U, V, log_file_name):
+def run(X, C, labels, *, logger=None, init=None, multi_V=False):
 
-    log_file = open(log_file_name + '.new', 'w')
+    assert isinstance(multi_V, bool)
+    log = logger.print if logger else __builtins__.print
+
+    U, V = init_uv(X, C, method=init)
 
     t = 0
-
-    # global log
-    # log = print
-    log = lambda *args, **kwargs: print(*args, **kwargs, file=log_file)  # noqa
-
     while True:
-        log('-------------')
-        log('== t = ', t)
+        log('t =', t)
 
         delta_V = 100
 
@@ -149,86 +147,43 @@ def run_new(U, V, log_file_name):
             V = new_V
             log('DELTA V', delta_V)
 
-        new_U = solve_U(X, V, V, gamma)
+            if not multi_V:
+                break
+
+        new_U = solve_U(X, V, gamma)
         delta_U = l21_norm(U - new_U)
         U = new_U
 
         log('DELTA U', delta_U)
-        log('NMI', NMI(U))
+        log('NMI', NMI(U, labels))
 
         if delta_U < 1e-1:
             log('Converged at step', t)
-            log('NMI', NMI(U))
+            log('NMI', NMI(U, labels))
             break
 
         t += 1
 
-    log_file.close()
-    return t, NMI(U)
+    return t, NMI(U, labels)
 
 
-def run_old(U, V, log_file_name):
+# if __name__ == '__main__':
 
-    log_file = open(log_file_name + '.old', 'w')
+#     images, labels = mndata.load_testing()
 
-    t = 0
-    # global print
-    # log = print
-    log = lambda *args, **kwargs: print(*args, **kwargs, file=log_file)  # noqa
+#     import argparse
+#     parser = argparse.ArgumentParser()
+#     parser.add_argument('action')
+#     action = parser.parse_args().action
 
-    while True:
-        log('-------------')
-        log('== t = ', t)
+#     if action == 'test':
+#         for i in range(200):
+#             U, V = init_uv(X)
+#             print('testing', i)
+#             fn = 'v3_log_kmpp/{}.log'.format(i)
+#             t1, nmi1 = run_new(fn)
+#             t2, nmi2 = run_old(fn)
 
-        delta_V = 100
-
-        new_V = update_V(V, U, X)
-        delta_V = l21_norm(new_V - V)
-        V = new_V
-        log('DELTA V', delta_V)
-
-        new_U = solve_U(X, V, V, gamma)
-        delta_U = l21_norm(U - new_U)
-        U = new_U
-
-        log('DELTA U', delta_U)
-        log('NMI', NMI(U))
-
-        if delta_U < 1e-1:
-            log('Converged at step', t)
-            log('NMI', NMI(U))
-            break
-
-        t += 1
-
-    log_file.close()
-    return t, NMI(U)
-
-
-if __name__ == '__main__':
-    from sklearn.cluster.k_means_ import _init_centroids, _tolerance
-    from RSFKM_orig import orig
-
-    images, labels = mndata.load_testing()
-    ndim = 784
-    N = size = len(labels)
-    C = 10
-    X = np.array(images).reshape((size, ndim)) / 255
-    t = 0
-
-    import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('action')
-    action = parser.parse_args().action
-
-    if action == 'test':
-        for i in range(200):
-            U, V = init_uv(X)
-            print('testing', i)
-            fn = 'v3_log/{}.log'.format(i)
-            t1, nmi1 = run_new(U, V, fn)
-            t2, nmi2 = run_old(U, V, fn)
-
-            with open('v3_log/{}.stat'.format(i), 'w') as f:
-                print(t1, nmi1, file=f)
-                print(t2, nmi2, file=f)
+#             with open('v3_log_kmpp/{}.stat'.format(i), 'w') as f:
+#                 print(t1, nmi1, file=f)
+#                 print(t2, nmi2, file=f)
