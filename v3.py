@@ -108,6 +108,46 @@ def NMI(U, labels):
     return nmi(labels, np.argmax(U, axis=1))
 
 
+def origin_init(X, C):
+
+    N, ndim = len(X), len(X[0])
+    size = N
+
+    def origin_solve_U(x, v, gamma):
+        U = np.zeros((N, C))
+        for i in range(N):
+            xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
+            h = l21_norm(xi - v, axis=1)
+            h = (-h) / (4 * gamma * epsilon**0.5 / 0.63817562)
+            U[i, :] = solve_huang_eq_13(h)
+        return U
+
+    def origin_update_V(x, u, v):
+        A = 0
+        V = np.zeros((C, ndim))
+        for k in range(C):
+            vk = v[k, :].reshape((1, ndim))
+            for i in range(N):
+                xi = x[i, :].reshape((1, ndim))
+                V[k, :] = V[k, :] + 1 / (2 * l21_norm(xi - vk)) * u[i, k] * xi
+                A = A + 1 / (2 * l21_norm(xi - vk)) * u[i, k]
+            V[k, :] = V[k, :] / A
+        return V
+
+    V = np.random.random((C, ndim))
+    U = np.zeros((size, C))
+    while True:
+        U = origin_solve_U(X, V, gamma)
+        new_V = origin_update_V(X, U, V)
+        delta = l21_norm(new_V - V)
+        V = new_V
+        print(delta)
+        if delta < 1e-1:
+            break
+
+    return U, V
+
+
 def init_uv(X, C, *, method):
 
     N, ndim = len(X), len(X[0])
@@ -116,6 +156,8 @@ def init_uv(X, C, *, method):
 
     if method == 'random':
         V = np.random.random((C, ndim))
+    elif method == 'orig':
+        return origin_init(X, C)
     else:
         V = _init_centroids(X, C, method)
 

@@ -116,7 +116,7 @@ class GridTester:
 
 if __name__ == '__main__':
 
-    GridTester('v3_result', 300, [
+    pg1 = [
         (
             'sv_random',
             {
@@ -146,4 +146,23 @@ if __name__ == '__main__':
                 'init': 'k-means++'
             }
         ),
-    ]).execute()
+    ]
+
+    pg2 = [
+        (
+            'mv_orig',
+            {
+                'multi_V': True,
+                'init': 'orig'
+            }
+        ),
+        (
+            'sv_orig',
+            {
+                'multi_V': False,
+                'init': 'orig'
+            }
+        ),
+    ]
+
+    GridTester('v3_result', 300, pg2).execute()
