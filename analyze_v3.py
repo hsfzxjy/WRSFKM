@@ -5,12 +5,12 @@ import numpy as np
 import pandas as pd
 import argparse
 import tarfile
+from collections import defaultdict
 
 
 def load_stats(fn):
 
-    # ts, nmis = [], []
-    df = []
+    tdf, nmidf = defaultdict(list), defaultdict(list)
 
     tar = tarfile.open(fn, 'r:gz')
 
@@ -20,12 +20,13 @@ def load_stats(fn):
             continue
 
         f = tar.extractfile(member)
+        name = member.name.rpartition('.')[0]
+        for line in f:
+            t, nmi = map(float, line.strip().split())
+            tdf[name].append(t)
+            nmidf[name].append(nmi)
 
-        new_t, new_nmi = map(float, f.readline().strip().split())
-        old_t, old_nmi = map(float, f.readline().strip().split())
-        df.append([new_t, old_t, new_nmi, old_nmi])
-
-    return pd.DataFrame(data=df, columns=['new steps', 'old steps', 'new NMI', 'old NMI'])
+    return pd.DataFrame(data=tdf), pd.DataFrame(data=nmidf)
 
 
 if __name__ == '__main__':
@@ -35,15 +36,17 @@ if __name__ == '__main__':
 
     fn = parser.parse_args().FILE
 
-    df = load_stats(fn)
-    print(df.describe())
-    df.hist()
-    # plt.plot(nmis[:, 0] - nmis[:, 1])
-    # plt.grid()
-    df.plot(x='new steps', y='new NMI', style='.')
-    df.plot(x='old steps', y='old NMI', style='.')
+    t, nmi = load_stats(fn)
+    print(t.describe())
+    print(nmi.describe())
+    t.hist()
+    nmi.hist()
+    # # plt.plot(nmis[:, 0] - nmis[:, 1])
+    # # plt.grid()
+    # df.plot(x='new steps', y='new NMI', style='.')
+    # df.plot(x='old steps', y='old NMI', style='.')
 
     plt.show()
-    # plt.plot(ts[:, 0] - ts[:, 1])
-    # plt.grid()
-    # plt.show()
+    # # plt.plot(ts[:, 0] - ts[:, 1])
+    # # plt.grid()
+    # # plt.show()

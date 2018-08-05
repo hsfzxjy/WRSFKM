@@ -123,9 +123,9 @@ def origin_init(X, C):
         return U
 
     def origin_update_V(x, u, v):
-        A = 0
         V = np.zeros((C, ndim))
         for k in range(C):
+            A = 0
             vk = v[k, :].reshape((1, ndim))
             for i in range(N):
                 xi = x[i, :].reshape((1, ndim))
