@@ -203,7 +203,7 @@ def E(U, V, X, gamma, epsilon):
         for k in range(C):
             W[i, k] = U[i, k] * welsch_func(l21_norm(xi - V[k, :]), epsilon)
 
-    return np.sum(U * W) + gamma * l21_norm(U)**2
+    return np.sum(W) + gamma * l21_norm(U)**2
     #
     # return 1
 
