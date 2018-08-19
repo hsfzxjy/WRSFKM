@@ -197,13 +197,14 @@ def E(U, V, X, gamma, epsilon):
 
     N, C, ndim = len(X), len(V), len(X[0])
 
-    W = np.empty(shape=(N, C), dtype=np.float64)
+    # W = np.empty(shape=(N, C), dtype=np.float64)
+    s = 0
     for i in range(N):
         xi = X[i, :]
         for k in range(C):
-            W[i, k] = U[i, k] * welsch_func(l21_norm(xi - V[k, :]), epsilon)
+            s += U[i, k] * welsch_func(l21_norm(xi - V[k, :]), epsilon)
 
-    return np.sum(W) + gamma * l21_norm(U)**2
+    return s + gamma * l21_norm(U)**2
     #
     # return 1
 
