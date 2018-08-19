@@ -204,7 +204,8 @@ def E(U, V, X, gamma, epsilon):
         for k in range(C):
             s += U[i, k] * welsch_func(l21_norm(xi - V[k, :]), epsilon)
 
-    return s + gamma * l21_norm(U)**2
+    return s
+    # return s + gamma * l21_norm(U)**2
     #
     # return 1
 
