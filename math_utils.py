@@ -42,19 +42,19 @@ def df(x, u):
     return (x > u).sum() / n - 1
 
 
-# @cc.export('solve_huang_eq_24', 'f8(f8[:,:])')
-# @njit
-# def solve_huang_eq_24(u):
+@cc.export('solve_huang_eq_24', 'f8(f8[:,:])')
+@njit
+def solve_huang_eq_24(u):
 
-#     EPS = 1e-4
+    EPS = 1e-4
 
-#     lamb = np.min(u)
-#     while True:
-#         new_lamb = lamb - f(lamb, u) / df(lamb, u)
-#         if np.abs(new_lamb - lamb) < EPS:
-#             return new_lamb
+    lamb = np.min(u)
+    while True:
+        new_lamb = lamb - f(lamb, u) / df(lamb, u)
+        if np.abs(new_lamb - lamb) < EPS:
+            return new_lamb
 
-#         lamb = new_lamb
+        lamb = new_lamb
 
 
 # @cc.export('solve_huang_eq_13', 'f8[:](f8[:])')
