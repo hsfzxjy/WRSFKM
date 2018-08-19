@@ -185,20 +185,23 @@ def welsch_func(x, epsilon):
 
 #     return U, V
 
+@cc.export('test', 'f8()')
+def test():
+    return 1
 
-@cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
-@njit
-def E(U, V, X, gamma, epsilon):
+# @cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
+# @njit
+# def E(U, V, X, gamma, epsilon):
 
-    N, C, ndim = len(X), len(V), len(X[0])
+#     N, C, ndim = len(X), len(V), len(X[0])
 
-    W = np.empty(shape=(N, C), dtype=np.float64)
-    for i in range(N):
-        xi = X[i, :]
-        for k in range(C):
-            W[i, k] = welsch_func(l21_norm(xi - V[k, :]), epsilon)
+#     W = np.empty(shape=(N, C), dtype=np.float64)
+#     for i in range(N):
+#         xi = X[i, :]
+#         for k in range(C):
+#             W[i, k] = welsch_func(l21_norm(xi - V[k, :]), epsilon)
 
-    return np.sum(U * W) + gamma * l21_norm(U)**2
+#     return np.sum(U * W) + gamma * l21_norm(U)**2
 
 
 if __name__ == '__main__':
