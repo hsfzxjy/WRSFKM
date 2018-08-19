@@ -34,12 +34,12 @@ def f(x, u):
     return clip(np.full(u.shape, x, dtype=np.float64) - u).sum() / n - x
 
 
-# @cc.export('df', 'f8(f8, f8[:])')
-# @njit
-# def df(x, u):
-#     n = len(u)
+@cc.export('df', 'f8(f8, f8[:])')
+@njit
+def df(x, u):
+    n = len(u)
 
-#     return (x > u).sum() / n - 1
+    return (x > u).sum() / n - 1
 
 
 # @cc.export('solve_huang_eq_24', 'f8(f8[:,:])')
