@@ -127,27 +127,40 @@ class DualTester:
 
         os.makedirs(root_directory, exist_ok=True)
 
-    def execute(self):
+    def target(self, index):
 
         from v4 import run, init_uv
 
         X, C, labels = get_mnist_data()
+
+        U, V = init_uv(X, C, **self.init_params)
+
+        result = {}
+
+        for name, param in self.params.items():
+
+            logger = Logger(os.path.join(self.root_directory, name + '.log.' + str(index)))
+            t, nmi = run(X, C, labels, logger=logger, init='preset', initial=(U, V), **param)
+            logger.close()
+            result[name] = (t, nmi)
+
+        return result
+
+    def execute(self):
+
+        import multiprocessing.pool as mpp
+
+        pool = mpp.Pool()
+
+        results = pool.map(self.target, range(self.times))
 
         main_loggers = {
             name: Logger(os.path.join(self.root_directory, name + '.stat'))
             for name in self.params
         }
 
-        for i in range(self.times):
-            print('times', i)
-            U, V = init_uv(X, C, **self.init_params)
-
-            for name, param in self.params.items():
-
-                logger = Logger(os.path.join(self.root_directory, name + '.log.' + str(i)))
-                t, nmi = run(X, C, labels, logger=logger, init='preset', initial=(U, V), **param)
-                logger.close()
-
+        for result in results:
+            for name, (t, nmi) in result:
                 main_loggers[name].print(t, nmi)
 
         for logger in main_loggers.values():
