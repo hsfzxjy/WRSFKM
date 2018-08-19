@@ -158,7 +158,7 @@ class DualTester:
             name: Logger(os.path.join(self.root_directory, name + '.stat'))
             for name in self.params
         }
-
+        print(results)
         for result in results:
             for name, (t, nmi) in result:
                 main_loggers[name].print(t, nmi)
