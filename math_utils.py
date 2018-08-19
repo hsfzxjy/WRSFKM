@@ -71,13 +71,13 @@ def solve_huang_eq_13(v):
     return u + lambda_star - lambda_bar_star * np.ones(n)
 
 
-# @cc.export('welsch_func', 'f8[:](f8[:], f8)')
-# @njit
-# def welsch_func(x, epsilon):
+@cc.export('welsch_func', 'f8[:](f8[:], f8)')
+@njit
+def welsch_func(x, epsilon):
 
-#     result = (1 - np.exp(- epsilon * x ** 2)) / epsilon
+    result = (1 - np.exp(- epsilon * x ** 2)) / epsilon
 
-#     return result
+    return result
 
 
 # @cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8, f8)')
