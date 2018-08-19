@@ -148,9 +148,10 @@ class DualTester:
 
     def execute(self):
 
+        import os
         import multiprocessing.pool as mpp
 
-        pool = mpp.Pool()
+        pool = mpp.Pool(int(os.cpu_count() * .75))
 
         results = pool.map(self.target, range(self.times))
 
@@ -176,7 +177,7 @@ if __name__ == '__main__':
             'sv_random': {'iter_method': 'sv'},
             'aa_random': {'iter_method': 'aa'},
         },
-        times=200
+        times=80
     ).execute()
 
     # DualTester(
