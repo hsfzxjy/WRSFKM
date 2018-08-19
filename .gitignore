@@ -4,3 +4,4 @@ __pycache__/
 *.so
 /data/*
 !/data/*.py
+!/data/MNIST*
