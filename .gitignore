@@ -2,3 +2,5 @@ __pycache__/
 *log*
 *result*
 *.so
+/data/*
+!/data/*.py

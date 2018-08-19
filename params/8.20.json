@@ -1,0 +1,15 @@
+{
+    "root_directory": "8.20",
+    "init_params": {
+        "method": "random"
+    },
+    "dataset": "mnist_10k",
+    "mutual": {"epsilon": 1e-4, "gamma": 0.001},
+    "params": {
+            "sv_random": {"iter_method": "sv"},
+            "aa_random_3": {"iter_method": "aa", "mmax": 3},
+            "aa_random_4": {"iter_method": "aa", "mmax": 4},
+            "aa_random_2": {"iter_method": "aa", "mmax": 2}
+    },
+    "times": 1
+}
