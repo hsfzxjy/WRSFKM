@@ -204,7 +204,7 @@ from scipy.linalg import qr_delete
 from math_utils import E
 
 
-def anderson_iteration(X, C, U, V, labels, *, logger=None):
+def anderson_iteration(X, C, U, V, labels, *, logger=None, max_iteration=300):
 
     log = logger.print if logger else __builtins__.print
 
@@ -237,6 +237,9 @@ def anderson_iteration(X, C, U, V, labels, *, logger=None):
         new_E = E(U_new, V_old, X, gamma, epsilon)
 
         if is_converged:
+            return t, NMI(U_new, labels)
+
+        if t > max_iteration:
             return t, NMI(U_new, labels)
 
         if new_E >= old_E:
