@@ -25,13 +25,13 @@ def clip(x):
     return w
 
 
-# @cc.export('f', 'f8(f8, f8[:])')
-# @njit
-# def f(x, u):
+@cc.export('f', 'f8(f8, f8[:])')
+@njit
+def f(x, u):
 
-#     n = len(u)
+    n = len(u)
 
-#     return clip(np.full(u.shape, x, dtype=np.float64) - u).sum() / n - x
+    return clip(np.full(u.shape, x, dtype=np.float64) - u).sum() / n - x
 
 
 # @cc.export('df', 'f8(f8, f8[:])')
