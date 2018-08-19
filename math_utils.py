@@ -102,43 +102,43 @@ def welsch_func(x, epsilon):
 #     return U
 
 
-@cc.export('update_V', 'f8[:, :](f8[:, :], f8[:, :], f8[:, :], f8)')
-def update_V(v, u, x, epsilon):
-
-    N, C, ndim = len(x), len(v), len(x[0])  # noqa
-
-    W = np.empty((C, N), dtype=np.float64)
-
-    for k in range(C):
-        for i in range(N):
-            W[k, i] = u[i, k] * np.exp(-epsilon * l21_norm(x[i, :] - v[k, :])**2)
-
-    new_v = np.zeros(v.shape)
-
-    for k in range(C):
-        denominator = W[k, :].sum()
-
-        new_v[k, :] = W[k, :].reshape((1, N)) @ x / denominator
-
-    return new_v
-
-
-# @cc.export('origin_solve_U', 'f8[:,:](f8[:,:],f8[:,:],f8,f8)')
-# @njit
-# def origin_solve_U(x, v, gamma, epsilon):
+# @cc.export('update_V', 'f8[:, :](f8[:, :], f8[:, :], f8[:, :], f8)')
+# def update_V(v, u, x, epsilon):
 
 #     N, C, ndim = len(x), len(v), len(x[0])  # noqa
 
-#     U = np.zeros((N, C))
-#     for i in range(N):
-#         # xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
-#         h = np.empty(shape=(C,), dtype=np.float64)
-#         for j in range(C):
-#             h[j] = l21_norm(x[i, :] - v[j, :])
-#         # h = l21_norm(xi - v, axis=1)
-#         h = (-h) / (4 * gamma * epsilon**0.5 / 0.63817562)
-#         U[i, :] = solve_huang_eq_13(h)
-#     return U
+#     W = np.empty((C, N), dtype=np.float64)
+
+#     for k in range(C):
+#         for i in range(N):
+#             W[k, i] = u[i, k] * np.exp(-epsilon * l21_norm(x[i, :] - v[k, :])**2)
+
+#     new_v = np.zeros(v.shape)
+
+#     for k in range(C):
+#         denominator = W[k, :].sum()
+
+#         new_v[k, :] = W[k, :].reshape((1, N)) @ x / denominator
+
+#     return new_v
+
+
+@cc.export('origin_solve_U', 'f8[:,:](f8[:,:],f8[:,:],f8,f8)')
+@njit
+def origin_solve_U(x, v, gamma, epsilon):
+
+    N, C, ndim = len(x), len(v), len(x[0])  # noqa
+
+    U = np.zeros((N, C))
+    for i in range(N):
+        # xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
+        h = np.empty(shape=(C,), dtype=np.float64)
+        for j in range(C):
+            h[j] = l21_norm(x[i, :] - v[j, :])
+        # h = l21_norm(xi - v, axis=1)
+        h = (-h) / (4 * gamma * epsilon**0.5 / 0.63817562)
+        U[i, :] = solve_huang_eq_13(h)
+    return U
 
 
 # @cc.export('origin_update_V', 'f8[:,:](f8[:,:],f8[:,:],f8[:,:])')
