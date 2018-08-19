@@ -123,22 +123,22 @@ def welsch_func(x, epsilon):
 #     return new_v
 
 
-@cc.export('origin_solve_U', 'f8[:,:](f8[:,:],f8[:,:],f8,f8)')
-@njit
-def origin_solve_U(x, v, gamma, epsilon):
+# @cc.export('origin_solve_U', 'f8[:,:](f8[:,:],f8[:,:],f8,f8)')
+# @njit
+# def origin_solve_U(x, v, gamma, epsilon):
 
-    N, C, ndim = len(x), len(v), len(x[0])  # noqa
+#     N, C, ndim = len(x), len(v), len(x[0])  # noqa
 
-    U = np.zeros((N, C))
-    for i in range(N):
-        # xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
-        h = np.empty(shape=(C,), dtype=np.float64)
-        for j in range(C):
-            h[j] = l21_norm(x[i, :] - v[j, :])
-        # h = l21_norm(xi - v, axis=1)
-        h = (-h) / (4 * gamma * epsilon**0.5 / 0.63817562)
-        U[i, :] = solve_huang_eq_13(h)
-    return U
+#     U = np.zeros((N, C))
+#     for i in range(N):
+#         # xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
+#         h = np.empty(shape=(C,), dtype=np.float64)
+#         for j in range(C):
+#             h[j] = l21_norm(x[i, :] - v[j, :])
+#         # h = l21_norm(xi - v, axis=1)
+#         h = (-h) / (4 * gamma * epsilon**0.5 / 0.63817562)
+#         U[i, :] = solve_huang_eq_13(h)
+#     return U
 
 
 # @cc.export('origin_update_V', 'f8[:,:](f8[:,:],f8[:,:],f8[:,:])')
@@ -186,18 +186,18 @@ def origin_solve_U(x, v, gamma, epsilon):
 #     return U, V
 
 
-# @cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
-# def E(U, V, X, gamma, epsilon):
+@cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
+def E(U, V, X, gamma, epsilon):
 
-#     N, C, ndim = len(X), len(V), len(X[0])
+    N, C, ndim = len(X), len(V), len(X[0])
 
-#     W = np.empty(shape=(N, C), dtype=np.float64)
-#     for i in range(N):
-#         xi = X[i, :]
-#         for k in range(C):
-#             W[i, k] = welsch_func(l21_norm(xi - V[k, :]), epsilon)
+    W = np.empty(shape=(N, C), dtype=np.float64)
+    for i in range(N):
+        xi = X[i, :]
+        for k in range(C):
+            W[i, k] = welsch_func(l21_norm(xi - V[k, :]), epsilon)
 
-#     return np.sum(U * W) + gamma * l21_norm(U)**2
+    return np.sum(U * W) + gamma * l21_norm(U)**2
 
 
 if __name__ == '__main__':
