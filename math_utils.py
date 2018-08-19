@@ -80,47 +80,47 @@ def welsch_func(x, epsilon):
     return result
 
 
-@cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8, f8)')
-def solve_U(x, v, gamma, epsilon):
+# @cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8, f8)')
+# def solve_U(x, v, gamma, epsilon):
 
-    N, C = len(x), len(v)
+#     N, C = len(x), len(v)
 
-    # U = pymp.shared.array((N, C))
+#     # U = pymp.shared.array((N, C))
 
-    U = np.empty(shape=(N, C), dtype=np.float64)
+#     U = np.empty(shape=(N, C), dtype=np.float64)
 
-    for i in range(N):
+#     for i in range(N):
 
-        w = np.empty(shape=(C,), dtype=np.float64)
-        for j in range(C):
-            w[j] = l21_norm(x[i, :] - v[j, :])
+#         w = np.empty(shape=(C,), dtype=np.float64)
+#         for j in range(C):
+#             w[j] = l21_norm(x[i, :] - v[j, :])
 
-        h = welsch_func(w, epsilon)
-        h = (-h) / (2 * gamma)
-        U[i, :] = solve_huang_eq_13(h)
+#         h = welsch_func(w, epsilon)
+#         h = (-h) / (2 * gamma)
+#         U[i, :] = solve_huang_eq_13(h)
 
-    return U
+#     return U
 
 
-# @cc.export('update_V', 'f8[:, :](f8[:, :], f8[:, :], f8[:, :], f8)')
-# def update_V(v, u, x, epsilon):
+@cc.export('update_V', 'f8[:, :](f8[:, :], f8[:, :], f8[:, :], f8)')
+def update_V(v, u, x, epsilon):
 
-#     N, C, ndim = len(x), len(v), len(x[0])  # noqa
+    N, C, ndim = len(x), len(v), len(x[0])  # noqa
 
-#     W = np.empty((C, N), dtype=np.float64)
+    W = np.empty((C, N), dtype=np.float64)
 
-#     for k in range(C):
-#         for i in range(N):
-#             W[k, i] = u[i, k] * np.exp(-epsilon * l21_norm(x[i, :] - v[k, :])**2)
+    for k in range(C):
+        for i in range(N):
+            W[k, i] = u[i, k] * np.exp(-epsilon * l21_norm(x[i, :] - v[k, :])**2)
 
-#     new_v = np.zeros(v.shape)
+    new_v = np.zeros(v.shape)
 
-#     for k in range(C):
-#         denominator = W[k, :].sum()
+    for k in range(C):
+        denominator = W[k, :].sum()
 
-#         new_v[k, :] = W[k, :].reshape((1, N)) @ x / denominator
+        new_v[k, :] = W[k, :].reshape((1, N)) @ x / denominator
 
-#     return new_v
+    return new_v
 
 
 # @cc.export('origin_solve_U', 'f8[:,:](f8[:,:],f8[:,:],f8,f8)')
