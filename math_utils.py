@@ -80,26 +80,26 @@ def welsch_func(x, epsilon):
     return result
 
 
-# @cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8, f8)')
-# def solve_U(x, v, gamma, epsilon):
+@cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8, f8)')
+def solve_U(x, v, gamma, epsilon):
 
-#     N, C = len(x), len(v)
+    N, C = len(x), len(v)
 
-#     # U = pymp.shared.array((N, C))
+    # U = pymp.shared.array((N, C))
 
-#     U = np.empty(shape=(N, C), dtype=np.float64)
+    U = np.empty(shape=(N, C), dtype=np.float64)
 
-#     for i in range(N):
+    for i in range(N):
 
-#         w = np.empty(shape=(C,), dtype=np.float64)
-#         for j in range(C):
-#             w[j] = l21_norm(x[i, :] - v[j, :])
+        w = np.empty(shape=(C,), dtype=np.float64)
+        for j in range(C):
+            w[j] = l21_norm(x[i, :] - v[j, :])
 
-#         h = welsch_func(w, epsilon)
-#         h = (-h) / (2 * gamma)
-#         U[i, :] = solve_huang_eq_13(h)
+        h = welsch_func(w, epsilon)
+        h = (-h) / (2 * gamma)
+        U[i, :] = solve_huang_eq_13(h)
 
-#     return U
+    return U
 
 
 # @cc.export('update_V', 'f8[:, :](f8[:, :], f8[:, :], f8[:, :], f8)')
