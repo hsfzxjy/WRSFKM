@@ -7,6 +7,7 @@ from numba.pycc import CC
 from numba import njit
 
 cc = CC('math_utils')
+cc.verbose = True
 
 
 @cc.export('clip', 'f8[:](f8[:])')
