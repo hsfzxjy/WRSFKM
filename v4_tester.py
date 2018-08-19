@@ -166,15 +166,15 @@ if __name__ == '__main__':
         times=200
     ).execute()
 
-    DualTester(
-        root_directory='v4_result',
-        init_params=dict(method='orig'),
-        params={
-            'sv_orig': {'iter_method': 'sv'},
-            'aa_orig': {'iter_method': 'aa'},
-        },
-        times=200,
-    ).execute()
+    # DualTester(
+    #     root_directory='v4_result',
+    #     init_params=dict(method='orig'),
+    #     params={
+    #         'sv_orig': {'iter_method': 'sv'},
+    #         'aa_orig': {'iter_method': 'aa'},
+    #     },
+    #     times=200,
+    # ).execute()
 
     # pg1 = [
     #     (
