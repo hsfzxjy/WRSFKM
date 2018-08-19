@@ -66,8 +66,8 @@ def welsch_func(x):
 
 
 # from opti_u import solve as solve_huang_eq_13_new
-import pymp
-import multiprocessing as mp
+# import pymp
+# import multiprocessing as mp
 
 
 def solve_U(x, v, gamma):
