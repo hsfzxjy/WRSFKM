@@ -57,18 +57,18 @@ def solve_huang_eq_24(u):
         lamb = new_lamb
 
 
-# @cc.export('solve_huang_eq_13', 'f8[:](f8[:])')
-# @njit
-# def solve_huang_eq_13(v):
-#     """
-#     min || alpha - v ||^2, subject to \sum{alpha}=1, alpha >= 0
-#     """
+@cc.export('solve_huang_eq_13', 'f8[:](f8[:])')
+@njit
+def solve_huang_eq_13(v):
+    """
+    min || alpha - v ||^2, subject to \sum{alpha}=1, alpha >= 0
+    """
 
-#     n = len(v)
-#     u = v - np.ones((n, n)) @ v / (n) + np.ones(n) / (n)
-#     lambda_bar_star = solve_huang_eq_24(u)
-#     lambda_star = (lambda_bar_star - u) + clip(u - lambda_bar_star)
-#     return u + lambda_star - lambda_bar_star * np.ones(n)
+    n = len(v)
+    u = v - np.ones((n, n)) @ v / (n) + np.ones(n) / (n)
+    lambda_bar_star = solve_huang_eq_24(u)
+    lambda_star = (lambda_bar_star - u) + clip(u - lambda_bar_star)
+    return u + lambda_star - lambda_bar_star * np.ones(n)
 
 
 # @cc.export('welsch_func', 'f8[:](f8[:], f8)')
