@@ -187,6 +187,7 @@ def welsch_func(x, epsilon):
 
 
 @cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
+@njit
 def E(U, V, X, gamma, epsilon):
 
     N, C, ndim = len(X), len(V), len(X[0])
