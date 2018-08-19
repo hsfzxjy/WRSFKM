@@ -200,12 +200,12 @@ def E(U, V, X, gamma, epsilon):
     W = np.empty(shape=(N, C), dtype=np.float64)
     for i in range(N):
         xi = X[i, :]
-    #     for k in range(C):
-    #         W[i, k] = welsch_func(l21_norm(xi - V[k, :]), epsilon)
+        for k in range(C):
+            W[i, k] = U[i, k] * welsch_func(l21_norm(xi - V[k, :]), epsilon)
 
-    # return np.sum(U * W) + gamma * l21_norm(U)**2
+    return np.sum(U * W) + gamma * l21_norm(U)**2
     #
-    return 1
+    # return 1
 
 
 if __name__ == '__main__':
