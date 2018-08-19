@@ -187,6 +187,7 @@ def welsch_func(x, epsilon):
 
 @cc.export('test', 'f8()')
 def test():
+    W = np.empty(shape=(1, 2), dtype=np.float64)
     return 1
 
 # @cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
