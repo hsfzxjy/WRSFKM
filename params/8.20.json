@@ -11,5 +11,5 @@
             "aa_random_4": {"iter_method": "aa", "mmax": 4},
             "aa_random_2": {"iter_method": "aa", "mmax": 2}
     },
-    "times": 1
+    "times": 50
 }
