@@ -201,5 +201,16 @@ def E(U, V, X, gamma, epsilon):
     return np.sum(U * W) + gamma * l21_norm(U)**2
 
 
+@cc.export('U_converged', '(f8[:, :], f8[:, :])')
+@njit
+def U_converged(old, new):
+
+    tol = 1e-1
+
+    delta = l21_norm(old - new)
+
+    return delta, delta < tol
+
+
 if __name__ == '__main__':
     cc.compile()

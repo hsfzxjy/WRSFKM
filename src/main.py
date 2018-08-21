@@ -23,7 +23,7 @@ from scipy.linalg import qr_delete
 from math_utils import E
 from metrics import metric
 
-from math_utils import solve_U, update_V, origin_init
+from math_utils import solve_U, update_V, origin_init, U_converged
 
 # gamma = .001
 # epsilon = 1e-4
@@ -67,13 +67,6 @@ def run(X, labels, p, logger):
         return normal_iteration(X, U, V, labels, p, logger=logger)
     elif p.iter_method.lower() == 'aa':
         return anderson_iteration(X, U, V, labels, p, logger=logger)
-
-
-def U_converged(old, new, tol=1e-1):
-
-    delta = l21_norm(old - new)
-
-    return delta, delta < tol
 
 
 def anderson_iteration(X, U, V, labels, p, logger):
@@ -180,6 +173,9 @@ def anderson_iteration(X, U, V, labels, p, logger):
         iterations += 1
 
 
+from anderson import anderson_iteration  # noqa
+
+
 def normal_iteration(X, U, V, labels, p, logger):
 
     epsilon, gamma = p.epsilon, p.gamma
@@ -225,8 +221,8 @@ if __name__ == '__main__':
         mutual={'epsilon': 1e-4, 'gamma': .001},
         dataset='mnist_10k',
         params={
-            'sv_random': {'iter_method': 'sv'},
             'aa_random': {'iter_method': 'aa'},
+            'sv_random': {'iter_method': 'sv'},
         },
         times=1
     ).execute()
