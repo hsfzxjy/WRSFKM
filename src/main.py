@@ -224,7 +224,7 @@ if __name__ == '__main__':
         mutual={'epsilon': 1e-4, 'gamma': .1},
         dataset='mnist_10k',
         params={
-            'aa_random': {'iter_method': 'aa', 'mmax': 3},
+            'aa_random': {'iter_method': 'aa', 'mmax': 9},
             'sv_random': {'iter_method': 'sv'},
         },
         times=1

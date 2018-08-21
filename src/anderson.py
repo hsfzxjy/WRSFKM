@@ -139,8 +139,7 @@ def anderson_iteration(X, U, V, labels, p, logger):
             accelerator.set_G(VAUt.reshape(aa_shape))
             V_new = accelerator.compute().reshape(V.shape)
 
-        delta_V, _ = U_converged(V_new, V_old)
         V_old = V_new
         # U_old = U_new
-        # old_E = new_E
+        old_E = new_E
         t += 1
