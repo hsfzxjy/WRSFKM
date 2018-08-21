@@ -88,15 +88,15 @@ class Anderson:
 
 def anderson_iteration(X, U, V, labels, p, logger):
 
-    V_old = V
-    U_old = U
-
     t = 0
     mmax = p.mmax or 3
 
     gamma = p.gamma
     epsilon = p.epsilon
     max_iteration = p.max_iterations or 300
+
+    V_old = update_V(V, U, X, epsilon)
+    U_old = U
 
     old_E = np.Infinity
     VAUt = None
@@ -114,18 +114,21 @@ def anderson_iteration(X, U, V, labels, p, logger):
 
         new_E = E(U_new, V_old, X, gamma, epsilon)
 
-        if energy.converged(new_E):
-            return U_new, V_old, t, metric(U_new, labels)
-
-        if t > max_iteration:
-            return U_new, V_old, t, metric(U_new, labels)
-
         if new_E >= old_E:
             V_old = VAUt
             U_new = solve_U(X, V_old, gamma, epsilon)
             new_E = E(U_new, V_old, X, gamma, epsilon)
 
             accelerator.replace(V_old.reshape(aa_shape))
+
+        if energy.converged(new_E):
+            return U_new, V_old, t, metric(U_new, labels)
+
+        if t > max_iteration:
+            return U_new, V_old, t, metric(U_new, labels)
+
+        energy.add(new_E)
+        logger.log_middle(new_E, metric(U_new, labels))
 
         VAUt = update_V(V_old, U_new, X, epsilon)
 
@@ -138,8 +141,6 @@ def anderson_iteration(X, U, V, labels, p, logger):
 
         delta_V, _ = U_converged(V_new, V_old)
         V_old = V_new
-        U_old = U_new
-        old_E = new_E
-        energy.add(old_E)
-        logger.log_middle(E(U_new, V_new, X, gamma, epsilon), metric(U_new, labels))
+        # U_old = U_new
+        # old_E = new_E
         t += 1
