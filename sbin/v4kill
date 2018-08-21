@@ -2,4 +2,5 @@
 
 pkill -f 'python v4_tester.py'
 pkill -f 'python3 v4_tester.py'
+pkill -f 'python3 src/tester.py'
 pkill -f '[python3] <defunct>'
