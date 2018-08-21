@@ -105,6 +105,7 @@ venv.bak/
 
 # custom
 *log*
+!/utils/loggers.py
 *result*
 /data/*
 !/data/*.py
