@@ -9,7 +9,7 @@ import scipy
 
 from math_utils import solve_U, update_V, E, U_converged
 from metrics import metric
-
+from energy import Energy
 
 from functools import reduce
 import operator
@@ -105,14 +105,16 @@ def anderson_iteration(X, U, V, labels, p, logger):
     aa_shape = (1, aa_ndim)
     accelerator = None
 
+    energy = Energy()
+
     while True:
         U_new = solve_U(X, V_old, gamma, epsilon)
 
-        delta_U, is_converged = U_converged(U_new, U_old)
+        # delta_U, is_converged = U_converged(U_new, U_old)
 
         new_E = E(U_new, V_old, X, gamma, epsilon)
 
-        if is_converged:
+        if energy.converged(new_E):
             return U_new, V_old, t, metric(U_new, labels)
 
         if t > max_iteration:
@@ -138,5 +140,6 @@ def anderson_iteration(X, U, V, labels, p, logger):
         V_old = V_new
         U_old = U_new
         old_E = new_E
+        energy.add(old_E)
         logger.log_middle(E(U_new, V_new, X, gamma, epsilon), metric(U_new, labels))
         t += 1

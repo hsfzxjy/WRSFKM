@@ -174,6 +174,7 @@ def anderson_iteration(X, U, V, labels, p, logger):
 
 
 from anderson import anderson_iteration  # noqa
+from energy import Energy
 
 
 def normal_iteration(X, U, V, labels, p, logger):
@@ -181,6 +182,8 @@ def normal_iteration(X, U, V, labels, p, logger):
     epsilon, gamma = p.epsilon, p.gamma
 
     multi_V = p.iter_method == 'mv'
+
+    energy = Energy()
 
     t = 0
     while True:
@@ -195,15 +198,15 @@ def normal_iteration(X, U, V, labels, p, logger):
             if not multi_V:
                 break
 
-        new_U = solve_U(X, V, gamma, epsilon)
-        delta_U = l21_norm(U - new_U)
-        U = new_U
+        U = solve_U(X, V, gamma, epsilon)
 
         metric_now = metric(U, labels)
+        E_now = E(U, V, X, gamma, epsilon)
+        logger.log_middle(E_now, metric_now)
 
-        logger.log_middle(E(U, V, X, gamma, epsilon), metric_now)
+        energy.add(E_now)
 
-        if delta_U < 1e-1:
+        if energy.converged():
             break
 
         t += 1
