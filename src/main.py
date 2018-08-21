@@ -33,7 +33,9 @@ def init_uv(X, C, p):
 
     N, ndim = len(X), len(X[0])
 
-    print(p)
+    np.random.seed(os.getpid())
+
+    print(p, 'test seed', np.random.random((1,)))
     assert isinstance(p.method, str)
 
     if p.method == 'random':
