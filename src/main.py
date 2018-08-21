@@ -183,7 +183,7 @@ def normal_iteration(X, U, V, labels, p, logger):
 
     multi_V = p.iter_method == 'mv'
 
-    energy = Energy()
+    # energy = Energy()
 
     t = 0
     while True:
@@ -198,15 +198,17 @@ def normal_iteration(X, U, V, labels, p, logger):
             if not multi_V:
                 break
 
-        U = solve_U(X, V, gamma, epsilon)
+        new_U = solve_U(X, V, gamma, epsilon)
+        _, converged = U_converged(new_U, U)
+        U = new_U
 
         metric_now = metric(U, labels)
         E_now = E(U, V, X, gamma, epsilon)
         logger.log_middle(E_now, metric_now)
 
-        energy.add(E_now)
+        # energy.add(E_now)
 
-        if energy.converged():
+        if converged:
             break
 
         t += 1
@@ -224,7 +226,7 @@ if __name__ == '__main__':
         mutual={'epsilon': 1e-4, 'gamma': .1},
         dataset='mnist_10k',
         params={
-            'aa_random': {'iter_method': 'aa', 'mmax': 9},
+            'aa_random': {'iter_method': 'aa', 'mmax': 3},
             'sv_random': {'iter_method': 'sv'},
         },
         times=1

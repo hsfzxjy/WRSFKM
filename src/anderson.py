@@ -96,7 +96,7 @@ def anderson_iteration(X, U, V, labels, p, logger):
     max_iteration = p.max_iterations or 300
 
     V_old = update_V(V, U, X, epsilon)
-    U_old = U
+    U_new = U
 
     old_E = np.Infinity
     VAUt = None
@@ -105,10 +105,17 @@ def anderson_iteration(X, U, V, labels, p, logger):
     aa_shape = (1, aa_ndim)
     accelerator = None
 
-    energy = Energy()
+    # energy = Energy()
 
     while True:
-        U_new = solve_U(X, V_old, gamma, epsilon)
+        U_now = solve_U(X, V_old, gamma, epsilon)
+        _, converged = U_converged(U_now, U_new)
+        print(_)
+        U_new = U_now
+
+        if converged:
+
+            return U_new, V_old, t, metric(U_new, labels)
 
         # delta_U, is_converged = U_converged(U_new, U_old)
 
@@ -121,13 +128,13 @@ def anderson_iteration(X, U, V, labels, p, logger):
 
             accelerator.replace(V_old.reshape(aa_shape))
 
-        if energy.converged(new_E):
-            return U_new, V_old, t, metric(U_new, labels)
+        # if energy.converged(new_E):
+        #     return U_new, V_old, t, metric(U_new, labels)
 
         if t > max_iteration:
             return U_new, V_old, t, metric(U_new, labels)
 
-        energy.add(new_E)
+        # energy.add(new_E)
         logger.log_middle(new_E, metric(U_new, labels))
 
         VAUt = update_V(V_old, U_new, X, epsilon)
