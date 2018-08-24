@@ -63,6 +63,9 @@ class Group:
             for k, lst in dct.items()
         }
 
+    def U(self):
+        return [instance.U for instance in self.lst]
+
 
 class TestResult:
 
@@ -118,6 +121,13 @@ class TestResult:
 
         return dct
 
+    def U(self):
+
+        return {
+            name: group.U
+            for name, group in self.groups.items()
+        }
+
 
 def load_from_directory(dir_):
 
@@ -140,6 +150,20 @@ def show(index):
     plt.show()
 
 
+def load_from_tgz(fn):
+
+    import tempfile
+    import tarfile
+    import os
+    import sys
+
+    dest = tempfile.mkdtemp()
+    tar = tarfile.open(fn, 'r:gz')
+    tar.extractall(dest)
+
+    return load_from_directory(osp.join(dest, os.listdir(dest)[0]))
+
+
 if __name__ == '__main__':
 
     import argparse
@@ -147,7 +171,13 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE')
 
-    result = load_from_directory(parser.parse_args().FILE)
+    input = parser.parse_args().FILE
+
+    if input.endswith('tgz') or input.endswith('tar.gz'):
+        result = load_from_tgz(input)
+    else:
+        result = load_from_directory(input)
+
     print(result.dataframe.loc['step', :])
     del parser, argparse
 

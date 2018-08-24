@@ -13,7 +13,7 @@ import numpy as np
 from numpy.linalg import norm as l21_norm
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi
 
-gamma = .005
+gamma = .1
 epsilon = 1
 
 # Download t10k_* from http://yann.lecun.com/exdb/mnist/
