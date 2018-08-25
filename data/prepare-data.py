@@ -23,7 +23,7 @@ def download(url, filename, md5_value):
 
     filename = resolve(download_dir, filename)
 
-    if osp.isfile(filename):  # and md5(filename) == md5_value:
+    if osp.isfile(filename) and md5(filename) == md5_value:
         return filename
 
     subprocess.run(['wget', url, '-O', filename])
@@ -51,8 +51,8 @@ if __name__ == '__main__':
     os.chdir(current_dir)
 
     datasets = [
-        ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-20/coil-20-proc.zip', 'coil20.zip', 'a04fd3c91db987e5e634e7e0945a430a', coil20),
-        # ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-100/coil-100.zip', 'coil100.zip', '', coil100)
+        ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-20/coil-20-proc.zip', 'coil20.zip', '464dec76a6abfcd00e8de6cf1e7d0acc', coil20),
+        ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-100/coil-100.zip', 'coil100.zip', '', coil100)
     ]
 
     for url, filename, md5_value, action in datasets:

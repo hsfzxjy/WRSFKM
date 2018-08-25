@@ -134,7 +134,10 @@ def load_from_directory(dir_):
     result = TestResult()
 
     for fn in glob(osp.join(dir_, '*.h5.*')):
-        result.add_instance(Instance(fn))
+        try:
+            result.add_instance(Instance(fn))
+        except OSError:
+            pass
 
     return result
 
@@ -167,7 +170,10 @@ def load_from_tgz(fn):
 if __name__ == '__main__':
 
     import argparse
-    # import matplotlib.pyplot as plt
+    try:
+        import matplotlib.pyplot as plt
+    except:  # noqa
+        pass
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE')
 
