@@ -8,5 +8,5 @@
     "params": {
             "aa_random": {"iter_method": "aa", "mmax": 4}
     },
-    "times": 40
+    "times": 200
 }
