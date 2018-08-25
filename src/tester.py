@@ -5,9 +5,9 @@ import sys
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
 
-from datasets import load_dataset
-from params import Params
-from loggers import Logger
+from utils.datasets import load_dataset
+from utils.params import Params
+from utils.loggers import Logger
 
 
 class DualTester:

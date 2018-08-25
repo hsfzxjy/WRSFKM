@@ -14,11 +14,11 @@ from numpy.linalg import norm as l21_norm
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi
 
 gamma = .1
-epsilon = 1
+epsilon = 30
 
 # Download t10k_* from http://yann.lecun.com/exdb/mnist/
 # Change to directory containing unzipped MNIST data
-mndata = mnist.MNIST('/data/science/MNIST/')
+mndata = mnist.MNIST('/home/hsfzxjy/srcs/RSFKM/data/MNIST-10K/')
 
 
 def solve_huang_eq_24(u):

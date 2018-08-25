@@ -1,15 +1,9 @@
-import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
-
 import numpy as np
 from numpy.linalg import norm
 import scipy
 
-from math_utils import solve_U, update_V, E, U_converged
-from metrics import metric
-from energy import Energy
+from utils.math_utils import solve_U, update_V, E, U_converged
+from utils.metrics import metric
 
 from functools import reduce
 import operator

@@ -1,6 +1,6 @@
 import os.path as osp
 
-resolve = lambda *parts: osp.join(osp.dirname(__file__), '..', 'data', *parts)  # noqa
+resolve = lambda *parts: osp.join(osp.dirname(__file__), '..', '..', 'data', *parts)  # noqa
 
 
 def mnist_10k():

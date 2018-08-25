@@ -11,19 +11,15 @@ Anderson Acceleration
 """
 
 import os
-import sys
-
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
-
 import numpy as np
 import scipy
 from numpy.linalg import norm as l21_norm
 from sklearn.cluster.k_means_ import _init_centroids
 from scipy.linalg import qr_delete
-from math_utils import E
-from metrics import metric
+from utils.math_utils import E
+from utils.metrics import metric
 
-from math_utils import solve_U, update_V, origin_init, U_converged
+from utils.math_utils import solve_U, update_V, origin_init, U_converged
 
 # gamma = .001
 # epsilon = 1e-4
@@ -65,13 +61,29 @@ def run(X, labels, p, logger):
     else:
         U, V = init_uv(X, C, method=p.init)
 
-    if p.iter_method.lower() in ['sv', 'mv']:
+    iter_method = p.iter_method.lower()
+
+    if iter_method in ['sv', 'mv']:
         return normal_iteration(X, U, V, labels, p, logger=logger)
-    elif p.iter_method.lower() == 'aa':
+    elif iter_method == 'aa':
         return anderson_iteration(X, U, V, labels, p, logger=logger)
+    elif iter_method == 'orig':
+        from orig import orig_iteration
+
+        return orig_iteration(X, U, V, labels, p, logger=logger)
 
 
 def anderson_iteration(X, U, V, labels, p, logger):
+
+    def multi_update_V(V, U, X):
+        delta_V = 100
+
+        while delta_V > 1e-1:
+            new_V = update_V(V, U, X, epsilon)
+            delta_V = l21_norm(new_V - V)
+            V = new_V
+
+        return V
 
     V_len = V.flatten().shape[0]
 
@@ -120,8 +132,8 @@ def anderson_iteration(X, U, V, labels, p, logger):
             old_E = E(U_new, V_old, X, gamma, epsilon)
 
         # AA Start
-        VAUt = gcur = update_V(V_old, U_new, X, epsilon)
-        # gcur = multi_update_V(V_old, U_new, X)
+        # VAUt = gcur = update_V(V_old, U_new, X, epsilon)
+        VAUt = gcur = multi_update_V(V_old, U_new, X)
         fcur = gcur - V_old
 
         if iterations > AAstart:
@@ -176,7 +188,6 @@ def anderson_iteration(X, U, V, labels, p, logger):
 
 
 from anderson import anderson_iteration  # noqa
-from energy import Energy
 
 
 def normal_iteration(X, U, V, labels, p, logger):
@@ -225,11 +236,11 @@ if __name__ == '__main__':
     DualTester(
         root_directory='',
         init_params=dict(method='random'),
-        mutual={'epsilon': 1e-4, 'gamma': .1},
+        mutual={'epsilon': 0.005, 'gamma': .05},
         dataset='mnist_10k',
         params={
-            'aa_random': {'iter_method': 'aa', 'mmax': 3},
-            'sv_random': {'iter_method': 'sv'},
+            'aa_random': {'iter_method': 'aa', 'mmax': 4},
+            # 'sv_random': {'iter_method': 'sv'},
         },
         times=1
     ).execute()
