@@ -41,7 +41,7 @@ def coil100(filename):
 
     subprocess.run(['rm', 'coil-100', '-rf'])
     subprocess.run(['unzip', filename, '-d', current_dir])
-    subprocess.run(['mv', '-f', 'coil-100', 'coil-100'])
+    # subprocess.run(['mv', '-f', 'coil-100', 'coil-100'])
 
 
 if __name__ == '__main__':
@@ -52,7 +52,7 @@ if __name__ == '__main__':
 
     datasets = [
         ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-20/coil-20-proc.zip', 'coil20.zip', '464dec76a6abfcd00e8de6cf1e7d0acc', coil20),
-        ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-100/coil-100.zip', 'coil100.zip', '', coil100)
+        ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-100/coil-100.zip', 'coil100.zip', 'd6b055f7761d4d2d29a780783c08fcb7', coil100)
     ]
 
     for url, filename, md5_value, action in datasets:
