@@ -18,6 +18,7 @@ from sklearn.cluster.k_means_ import _init_centroids
 from scipy.linalg import qr_delete
 from utils.math_utils import E
 from utils.metrics import metric
+from time import time
 
 from utils.math_utils import solve_U, update_V, origin_init, U_converged
 
@@ -29,7 +30,7 @@ def init_uv(X, C, p):
 
     N, ndim = len(X), len(X[0])
 
-    np.random.seed(os.getpid())
+    np.random.seed()
 
     print(p, 'test seed', np.random.random((1,)))
     assert isinstance(p.method, str)
