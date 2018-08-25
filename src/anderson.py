@@ -8,7 +8,23 @@ from utils.metrics import metric
 from functools import reduce
 import operator
 
+# import numba
 
+
+# @numba.jitclass([
+#     ('m_', numba.int64),
+#     ('dim_', numba.int64),
+#     ('current_F_', numba.float64[:]),
+#     ('prev_dG_', numba.float64[:, :]),
+#     ('prev_dF_', numba.float64[:, :]),
+#     ('M_', numba.float64[:, :]),
+#     ('theta_', numba.float64[:]),
+#     ('G', numba.float64[:, :]),
+#     ('dF_scale_', numba.float64[:]),
+#     ('current_u_', numba.float64[:, :]),
+#     ('iter_', numba.int64),
+#     ('col_idx_', numba.int64),
+# ])
 class Anderson:
 
     def __init__(self, m, ndim, u0):
@@ -58,7 +74,7 @@ class Anderson:
                 self.theta_[0] = 0
                 dF_norm = norm(self.prev_dF_[:, self.col_idx_])
                 dF_sqrnorm = dF_norm ** 2
-                self.M_[0:0] = dF_sqrnorm
+                self.M_[0, 0] = dF_sqrnorm
 
                 if dF_norm > eps:
                     self.theta_[0] = (self.prev_dF_[:, self.col_idx_] * self.current_F_).sum() / dF_sqrnorm
