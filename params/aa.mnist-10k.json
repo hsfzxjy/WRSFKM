@@ -1,5 +1,5 @@
 {
-    "root_directory": "aa.coil-20",
+    "root_directory": "aa.mnist-10k",
     "init_params": {
         "method": "random"
     },
