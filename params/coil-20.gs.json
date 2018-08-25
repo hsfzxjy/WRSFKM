@@ -3,7 +3,7 @@
     "init_params": {
         "method": "random"
     },
-    "dataset": "coil-20",
+    "dataset": "coil_20",
     "mutual": {},
     "scales": {
         "iter_method": ["aa"],
