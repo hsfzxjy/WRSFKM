@@ -167,7 +167,7 @@ def load_from_tgz(fn):
 if __name__ == '__main__':
 
     import argparse
-    import matplotlib.pyplot as plt
+    # import matplotlib.pyplot as plt
     parser = argparse.ArgumentParser()
     parser.add_argument('FILE')
 
@@ -180,6 +180,6 @@ if __name__ == '__main__':
 
     print(result.dataframe.loc['step', :])
     del parser, argparse
-
+    df = result.dataframe
     import IPython
     IPython.embed()
