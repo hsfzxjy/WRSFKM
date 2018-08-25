@@ -1,19 +1,41 @@
 import numpy as np
 import os.path as osp
+from skimage.transform import resize
+
 
 resolve = lambda *parts: osp.join(osp.dirname(__file__), '..', '..', 'data', *parts)  # noqa
 
 
 def mnist_10k():
 
+    import h5py
     import mnist
     import numpy as np
+    C = 10
+    directory = resolve('MNIST-10K')
+
+    h5fn = osp.join(directory, 'data.h5')
+    if osp.isfile(h5fn):
+
+        f = h5py.File(h5fn, 'r')
+        X = np.array(f.get('X'))
+        labels = np.array(f.get('labels'))
+
+        return X, C, labels
 
     images, labels = mnist.MNIST(resolve('MNIST-10K')).load_testing()
-    ndim = 784
+    ndim = 256
     size = len(labels)
-    C = 10
-    X = np.array(images).reshape((size, ndim)) / 255
+
+    X = np.empty((size, ndim))
+    for i, x in enumerate(images):
+        img = np.array(x).reshape((28, 28)) / 255
+        X[i, :] = resize(img, (16, 16)).reshape(ndim)
+
+    f = h5py.File(h5fn, 'w')
+    f.create_dataset('X', data=X)
+    f.create_dataset('labels', data=labels)
+    f.close()
 
     return X, C, labels
 
@@ -21,7 +43,6 @@ def mnist_10k():
 def coil_20():
 
     from scipy.misc import imread
-    from skimage.transform import resize
     from glob import glob
     import re
 

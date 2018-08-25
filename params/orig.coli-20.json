@@ -1,0 +1,12 @@
+{
+    "root_directory": "orig.coil-20",
+    "init_params": {
+        "method": "random"
+    },
+    "dataset": "coil_20",
+    "mutual": {"epsilon": 30, "gamma": 0.06},
+    "params": {
+            "aa_random": {"iter_method": "orig", "mmax": 4}
+    },
+    "times": 100
+}

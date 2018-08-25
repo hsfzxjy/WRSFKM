@@ -22,6 +22,8 @@ class Instance:
         self.U = np.array(f.get('U'))
         self.V = np.array(f.get('V'))
         self.result = np.array(f.get('result'))
+        if self.result.shape == ():
+            raise OSError
         f.close()
 
 
@@ -135,7 +137,8 @@ def load_from_directory(dir_):
 
     for fn in glob(osp.join(dir_, '*.h5.*')):
         try:
-            result.add_instance(Instance(fn))
+            instance = Instance(fn)
+            result.add_instance(instance)
         except OSError:
             pass
 
@@ -187,5 +190,7 @@ if __name__ == '__main__':
     print(result.dataframe.loc['step', :])
     del parser, argparse
     df = result.dataframe
-    import IPython
-    IPython.embed()
+    print(df.loc['acc', :].describe())
+    print(df.loc['nmi', :].describe())
+    # import IPython
+    # IPython.embed()

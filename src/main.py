@@ -120,29 +120,29 @@ if __name__ == '__main__':
 
     from tester import DualTester
 
-    # DualTester(
-    #     root_directory='',
-    #     init_params=dict(method='random'),
-    #     mutual={'epsilon': 0.005, 'gamma': .05},
-    #     dataset='mnist_10k',
-    #     params={
-    #         'aa_random': {'iter_method': 'aa', 'mmax': 4},
-    #         # 'sv_random': {'iter_method': 'sv'},
-    #     },
-    #     times=1
-    # ).execute()
-    #
     DualTester(
         root_directory='',
         init_params=dict(method='random'),
-        mutual={'epsilon': 0.005, 'gamma': .01},
-        dataset='coil_20',
+        mutual={'epsilon': 0.005, 'gamma': .05},
+        dataset='mnist_10k',
         params={
             'aa_random': {'iter_method': 'aa', 'mmax': 4},
             # 'sv_random': {'iter_method': 'sv'},
         },
         times=1
     ).execute()
+    #
+    # DualTester(
+    #     root_directory='',
+    #     init_params=dict(method='random'),
+    #     mutual={'epsilon': 0.005, 'gamma': .01},
+    #     dataset='coil_20',
+    #     params={
+    #         'aa_random': {'iter_method': 'aa', 'mmax': 4},
+    #         # 'sv_random': {'iter_method': 'sv'},
+    #     },
+    #     times=1
+    # ).execute()
 
     # # # from v3_tester import get_mnist_data, Logger
 
