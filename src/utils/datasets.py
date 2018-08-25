@@ -35,7 +35,7 @@ def coil_20():
         class_ = int(reg.findall(fn)[0])
         classes.append(class_)
 
-        img = resize(imread(fn, mode='L'), (64, 64)).flatten()
+        img = resize(imread(fn, mode='L'), (16, 16)).flatten()
         imgs.append(img)
 
     return np.array(imgs), 20, np.array(classes)

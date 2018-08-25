@@ -98,6 +98,8 @@ class Anderson:
 
 def anderson_iteration(X, U, V, labels, p, logger):
 
+    import time
+
     t = 0
     mmax = p.mmax or 3
 
@@ -118,7 +120,10 @@ def anderson_iteration(X, U, V, labels, p, logger):
     # energy = Energy()
 
     while True:
+        start = time.time()
         U_now = solve_U(X, V_old, gamma, epsilon)
+        end = time.time()
+        print('solve u', end - start)
         _, converged = U_converged(U_now, U_new)
         print(_)
         U_new = U_now
@@ -147,7 +152,10 @@ def anderson_iteration(X, U, V, labels, p, logger):
         # energy.add(new_E)
         logger.log_middle(new_E, metric(U_new, labels))
 
+        start = time.time()
         VAUt = update_V(V_old, U_new, X, epsilon)
+        end = time.time()
+        print('update v', end - start)
 
         if t == 0:
             accelerator = Anderson(mmax, aa_ndim, VAUt.reshape(aa_shape))
