@@ -41,8 +41,8 @@ class Logger:
             return
 
         self.group.create_dataset('middle', data=np.array(self.middle_data))
-        self.group.create_dataset('U', data=self.U)
-        self.group.create_dataset('V', data=self.V)
+        self.group.create_dataset('U', data=np.array([]))  # self.U)
+        self.group.create_dataset('V', data=np.array([]))  # self.V)
         self.group.create_dataset('result', data=np.array(self.result))
 
         self.file.close()

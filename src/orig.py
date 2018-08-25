@@ -89,11 +89,22 @@ if __name__ == '__main__':
 
     from tester import DualTester
 
+    # DualTester(
+    #     root_directory='',
+    #     init_params=dict(method='random'),
+    #     mutual={'epsilon': 30, 'gamma': .1},
+    #     dataset='mnist_10k',
+    #     params={
+    #         'orig_random': {'iter_method': 'orig'},
+    #     },
+    #     times=1
+    # ).execute()
+
     DualTester(
         root_directory='',
         init_params=dict(method='random'),
-        mutual={'epsilon': 30, 'gamma': .1},
-        dataset='mnist_10k',
+        mutual={'epsilon': 30, 'gamma': .05},
+        dataset='coil_20',
         params={
             'orig_random': {'iter_method': 'orig'},
         },

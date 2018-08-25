@@ -5,7 +5,7 @@ import os.path as osp
 import subprocess
 import hashlib
 
-current_dir = osp.dirname(__file__)
+current_dir = osp.dirname(osp.abspath(__file__))
 resolve = lambda *parts: osp.join(current_dir, *parts)  # noqa
 
 download_dir = resolve('downloaded_content')
@@ -23,7 +23,7 @@ def download(url, filename, md5_value):
 
     filename = resolve(download_dir, filename)
 
-    if osp.isfile(filename) and md5(filename) == md5_value:
+    if osp.isfile(filename):  # and md5(filename) == md5_value:
         return filename
 
     subprocess.run(['wget', url, '-O', filename])
@@ -34,7 +34,7 @@ def coil20(filename):
 
     subprocess.run(['rm', 'coil-20', '-rf'])
     subprocess.run(['unzip', filename, '-d', current_dir])
-    subprocess.run(['mv', '-f', 'coil-20-unproc', 'coil-20', ])
+    subprocess.run(['mv', '-f', 'coil-20-proc', 'coil-20', ])
 
 
 def coil100(filename):
@@ -47,9 +47,11 @@ def coil100(filename):
 if __name__ == '__main__':
 
     os.makedirs(download_dir, exist_ok=True)
+    print(download_dir, current_dir)
+    os.chdir(current_dir)
 
     datasets = [
-        ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-20/coil-20-unproc.zip', 'coil20.zip', 'a04fd3c91db987e5e634e7e0945a430a', coil20),
+        ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-20/coil-20-proc.zip', 'coil20.zip', 'a04fd3c91db987e5e634e7e0945a430a', coil20),
         # ('http://www.cs.columbia.edu/CAVE/databases/SLAM_coil-20_coil-100/coil-100/coil-100.zip', 'coil100.zip', '', coil100)
     ]
 
