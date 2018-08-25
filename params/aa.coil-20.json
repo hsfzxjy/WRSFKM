@@ -4,9 +4,9 @@
         "method": "random"
     },
     "dataset": "coil_20",
-    "mutual": {"epsilon": 0.005, "gamma": 0.05},
+    "mutual": {"epsilon": 0.005, "gamma": 0.01},
     "params": {
             "aa_random": {"iter_method": "aa", "mmax": 4}
     },
-    "times": 100
+    "times": 40
 }

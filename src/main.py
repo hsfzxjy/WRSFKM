@@ -135,7 +135,7 @@ if __name__ == '__main__':
     DualTester(
         root_directory='',
         init_params=dict(method='random'),
-        mutual={'epsilon': 5e-3, 'gamma': .005},
+        mutual={'epsilon': 0.005, 'gamma': .01},
         dataset='coil_20',
         params={
             'aa_random': {'iter_method': 'aa', 'mmax': 4},
