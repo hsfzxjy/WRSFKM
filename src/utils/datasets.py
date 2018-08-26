@@ -24,13 +24,14 @@ def mnist_10k():
         return X, C, labels
 
     images, labels = mnist.MNIST(resolve('MNIST-10K')).load_testing()
-    ndim = 256
+    len_ = 11
+    ndim = len_ ** 2
     size = len(labels)
 
     X = np.empty((size, ndim))
     for i, x in enumerate(images):
         img = np.array(x).reshape((28, 28)) / 255
-        X[i, :] = resize(img, (16, 16)).reshape(ndim)
+        X[i, :] = resize(img, (len_, len_)).reshape(ndim)
 
     f = h5py.File(h5fn, 'w')
     f.create_dataset('X', data=X)

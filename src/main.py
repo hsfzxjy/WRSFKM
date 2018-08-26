@@ -123,7 +123,7 @@ if __name__ == '__main__':
     DualTester(
         root_directory='',
         init_params=dict(method='random'),
-        mutual={'epsilon': 0.005, 'gamma': .05},
+        mutual={'epsilon': 1e-1, 'gamma': .7},
         dataset='mnist_10k',
         params={
             'aa_random': {'iter_method': 'aa', 'mmax': 4},

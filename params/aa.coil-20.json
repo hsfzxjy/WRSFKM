@@ -4,7 +4,7 @@
         "method": "random"
     },
     "dataset": "coil_20",
-    "mutual": {"epsilon": 0.005, "gamma": 0.01},
+    "mutual": {"epsilon": 0.008, "gamma": 0.0001},
     "params": {
             "aa_random": {"iter_method": "aa", "mmax": 4}
     },

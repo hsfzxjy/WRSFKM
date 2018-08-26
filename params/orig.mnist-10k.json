@@ -1,0 +1,12 @@
+{
+    "root_directory": "orig.mnist-10k",
+    "init_params": {
+        "method": "random"
+    },
+    "dataset": "mnist_10k",
+    "mutual": {"epsilon": 30, "gamma": 0.06},
+    "params": {
+            "aa_random": {"iter_method": "orig", "mmax": 4}
+    },
+    "times": 100
+}

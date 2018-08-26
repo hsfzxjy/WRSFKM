@@ -192,5 +192,5 @@ if __name__ == '__main__':
     df = result.dataframe
     print(df.loc['acc', :].describe())
     print(df.loc['nmi', :].describe())
-    # import IPython
-    # IPython.embed()
+    import IPython
+    IPython.embed()

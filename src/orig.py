@@ -92,7 +92,7 @@ if __name__ == '__main__':
     DualTester(
         root_directory='',
         init_params=dict(method='random'),
-        mutual={'epsilon': 30, 'gamma': .05},
+        mutual={'epsilon': 30, 'gamma': .5},
         dataset='mnist_10k',
         params={
             'orig_random': {'iter_method': 'orig'},
