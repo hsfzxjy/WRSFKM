@@ -3,7 +3,7 @@
     "init_params": {
         "method": "random"
     },
-    "dataset": "coil_20",
+    "dataset": "mnist_10k",
     "mutual": {},
     "scales": {
         "iter_method": ["orig"],
