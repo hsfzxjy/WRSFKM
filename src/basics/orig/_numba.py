@@ -7,7 +7,7 @@ from numpy.linalg import norm as l21_norm
 from numba import njit
 from numba.pycc import CC
 
-cc = CC('orig_accelerate')
+cc = CC('_numba')
 cc.verbose = True
 
 

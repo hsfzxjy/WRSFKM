@@ -1,0 +1,6 @@
+#!/bin/bash
+
+DIR=$(dirname $0)/..
+
+python3 $DIR/src/basics/ours/_numba.py
+# python3 $DIR/src/basics/orig/_numba.py

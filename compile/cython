@@ -1,0 +1,7 @@
+#!/bin/bash
+
+DIR=$(dirname $0)
+
+python3 $DIR/_setup_cython.py build_ext --inplace
+# cythonize -a -i $DIR/src/basics/ours/_cython.pyx
+# gcc $DIR/src/basics/ours/_cython.pyx -o _cython.cpython-36m-x86_64-linux-gnu.so

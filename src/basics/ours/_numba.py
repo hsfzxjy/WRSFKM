@@ -1,12 +1,15 @@
 #!/usr/bin/env python3
 
+from math import exp
+
 import numpy as np
 from numpy.linalg import norm as l21_norm
 
+import numba
 from numba.pycc import CC
 from numba import njit
 
-cc = CC('math_utils_')
+cc = CC('_numba')
 cc.verbose = True
 
 
@@ -17,10 +20,7 @@ def clip(x):
     w = np.zeros(x.shape)
 
     for i in range(x.shape[0]):
-        item = x[i].item()
-
-        if item > 0:
-            w[i] = item
+        w[i] = max(x[i].item(), 0)
 
     return w
 
@@ -29,7 +29,7 @@ def clip(x):
 @njit
 def f(x, u):
 
-    n = len(u)
+    n = u.shape[0]
 
     return clip(np.full(u.shape, x, dtype=np.float64) - u).sum() / n - x
 
@@ -37,9 +37,15 @@ def f(x, u):
 @cc.export('df', 'f8(f8, f8[:])')
 @njit
 def df(x, u):
-    n = len(u)
+    n = u.shape[0]
 
-    return (x > u).sum() / n - 1
+    # return (x > u).sum() / n - 1
+    s = 0.
+    for i in range(n):
+        if x > u[i].item():
+            s += 1
+
+    return s / n - 1
 
 
 @cc.export('solve_huang_eq_24', 'f8(f8[:,:])')
@@ -58,14 +64,27 @@ def solve_huang_eq_24(u):
 
 
 @cc.export('solve_huang_eq_13', 'f8[:](f8[:])')
-@njit
+@njit(fastmath=True)
 def solve_huang_eq_13(v):
     """
     min || alpha - v ||^2, subject to \sum{alpha}=1, alpha >= 0
     """
 
-    n = len(v)
-    u = v - np.ones((n, n)) @ v / (n) + np.ones(n) / (n)
+    n = v.shape[0]
+
+    # Acceleration for:
+    # u = v - np.ones((n, n)) @ v / (n) + np.ones(n) / (n)
+    term2 = np.empty((n,), dtype=np.float64)
+    v_sum = 0.
+    for i in range(n):
+        v_sum += v[i]
+
+    for i in range(n):
+        term2[i] = (v_sum - 1) / n
+
+    u = v - term2
+    # End of Acceleration
+
     lambda_bar_star = solve_huang_eq_24(u)
     lambda_star = (lambda_bar_star - u) + clip(u - lambda_bar_star)
     return u + lambda_star - lambda_bar_star * np.ones(n)
@@ -80,7 +99,66 @@ def welsch_func(x, epsilon):
     return result
 
 
+@cc.export('sqr_welsch_func_scalar', 'f8(f8, f8)')
+@njit(fastmath=True)
+def sqr_welsch_func_scalar(x, epsilon):
+
+    result = (1 - exp(- epsilon * x)) / epsilon
+
+    return result
+
+
+@cc.export('sqr_welsch_func', 'f8[:](f8[:], f8)')
+@njit(fastmath=True)
+def sqr_welsch_func(x, epsilon):
+
+    result = (1 - np.exp(- epsilon * x)) / epsilon
+
+    return result
+
+
+@cc.export('sqrnorm_2d', 'f8(f8[:, :])')
+@njit(fastmath=True)
+def sqrnorm_2d(x):
+
+    result = 0.
+
+    for i in range(x.shape[0]):
+        for j in range(x.shape[1]):
+            a = x[i, j]
+            result += a * a
+
+    return result
+
+
+@cc.export('sqrnorm', 'f8(f8[:])')
+@njit(fastmath=True)
+def sqrnorm(x):
+
+    result = 0.
+
+    for i in range(x.shape[0]):
+        a = x[i]
+        result += a * a
+
+    return result
+
+
+@cc.export('sqrdistance', 'f8(f8[:], f8[:])')
+@njit(fastmath=True)
+def sqrdistance(x, y):
+
+    result = 0.
+
+    for i in range(x.shape[0]):
+        delta = x[i] - y[i]
+        result += delta * delta
+
+    return result
+
+
 @cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8, f8)')
+@njit(fastmath=True, parrallel=True)
 def solve_U(x, v, gamma, epsilon):
 
     N, C = len(x), len(v)
@@ -89,20 +167,22 @@ def solve_U(x, v, gamma, epsilon):
 
     U = np.empty(shape=(N, C), dtype=np.float64)
 
-    for i in range(N):
+    for i in numba.prange(N):
 
-        w = np.empty(shape=(C,), dtype=np.float64)
+        h = np.empty(shape=(C,), dtype=np.float64)
+        xi = x[i, :]
         for j in range(C):
-            w[j] = l21_norm(x[i, :] - v[j, :])
+            h[j] = - sqr_welsch_func_scalar(sqrdistance(xi, v[j, :]), epsilon) / (2 * gamma)
 
-        h = welsch_func(w, epsilon)
-        h = (-h) / (2 * gamma)
+        # h = - w / (2 * gamma)
+        # h = - sqr_welsch_func(w, epsilon) / (2 * gamma)
         U[i, :] = solve_huang_eq_13(h)
 
     return U
 
 
 @cc.export('update_V', 'f8[:, :](f8[:, :], f8[:, :], f8[:, :], f8)')
+@njit(fastmath=True, parrallel=True)
 def update_V(v, u, x, epsilon):
 
     N, C, ndim = len(x), len(v), len(x[0])  # noqa
@@ -113,17 +193,34 @@ def update_V(v, u, x, epsilon):
     #     for k in range(C):
     #         W[k, i] = u[i, k] * np.exp(-epsilon * l21_norm(x[i, :] - v[k, :])**2)
 
-    new_v = np.zeros(v.shape)
+    new_v = np.zeros(v.shape, dtype=np.float64)
+
+    # Change memory access order to accelerate
+    xt = x.transpose().copy()
+    ut = u.transpose().copy()
 
     for k in range(C):
         vec = np.empty((N,), dtype=np.float64)
 
+        denominator = 0.
+        vk = v[k, :]
+
         for i in range(N):
-            vec[i] = u[i, k] * np.exp(-epsilon * l21_norm(x[i, :] - v[k, :])**2)
+            tmp = vec[i] = ut[k, i] * exp(
+                -epsilon *
+                sqrdistance(x[i, :], vk)
+            )
 
-        denominator = vec.sum()
+            denominator += tmp
 
-        new_v[k, :] = vec.reshape((1, N)) @ x / denominator
+        # Acceleration for:
+        # new_v[k, :] = vec @ x / denominator
+        for j in range(ndim):
+
+            tmp = 0.
+            for i in range(N):
+                tmp += vec[i] * xt[j, i]
+            new_v[k, j] = tmp / denominator
 
     return new_v
 
@@ -192,29 +289,29 @@ def origin_init(X, C, gamma, epsilon):
 
 
 @cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
-@njit
+@njit(parrallel=True)
 def E(U, V, X, gamma, epsilon):
 
     N, C, ndim = len(X), len(V), len(X[0])  # noqa
 
-    W = np.empty(shape=(N, C), dtype=np.float64)
+    term1 = 0.
     for i in range(N):
         xi = X[i, :]
         for k in range(C):
-            W[i, k] = welsch_func(l21_norm(xi - V[k, :]), epsilon)
+            term1 += U[i, k] * sqr_welsch_func_scalar(sqrdistance(xi, V[k, :]), epsilon)
 
-    return np.sum(U * W) + gamma * l21_norm(U)**2
+    return term1 + gamma * sqrnorm_2d(U)
 
 
-@cc.export('U_converged', '(f8[:, :], f8[:, :])')
-@njit
-def U_converged(old, new):
+# @cc.export('U_converged', '(f8[:, :], f8[:, :])')
+# @njit
+# def U_converged(old, new):
 
-    tol = 1e-1
+#     tol = 1e-1
 
-    delta = l21_norm(old - new)
+#     delta = l21_norm(old - new)
 
-    return delta, delta < tol
+#     return delta, delta < tol
 
 
 if __name__ == '__main__':

@@ -26,7 +26,8 @@ class DualTester:
 
     def target(self, index):
 
-        from main import run, init_uv
+        from init import init_uv
+        from iterations import run
 
         X, C, labels = load_dataset(self.dataset)
 
@@ -72,6 +73,7 @@ if __name__ == '__main__':
     with open(parser.parse_args().PARAM, 'r') as f:
         params = json.load(f)
 
-    params['root_directory'] = os.path.join(os.path.dirname(__file__), '..', 'results', params['root_directory'])
+    if params['root_directory']:
+        params['root_directory'] = os.path.join(os.path.dirname(__file__), '..', 'results', params['root_directory'])
 
     DualTester(**params).execute()

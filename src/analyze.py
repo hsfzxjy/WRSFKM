@@ -14,8 +14,8 @@ class Instance:
 
         basename = osp.basename(filename)
         splitted = basename.split('.')
-        self.name = splitted[0]
         self.index = int(splitted[-1])
+        self.name = basename.rpartition('.')[0].rpartition('.')[0]
 
         f = h5py.File(filename, 'r')
         self.middle = np.array(f.get('middle'))

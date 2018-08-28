@@ -20,7 +20,7 @@ def acc(X, Y):
     return corrects / N
 
 
-def metric(U, labels):
+def nmi_acc(U, labels):
 
     X = np.argmax(U, axis=1)
 
