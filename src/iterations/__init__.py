@@ -20,6 +20,10 @@ def run(X, labels, p, logger):
         from iterations.anderson import iteration
     elif iter_method == 'orig':
         from iterations.orig import iteration
+    elif iter_method == 'kmeans':
+        from iterations.kmeans import iteration
+    elif iter_method == 'fkm':
+        from iterations.fkm import iteration
     else:
         raise RuntimeError('Unknown method.')
 
