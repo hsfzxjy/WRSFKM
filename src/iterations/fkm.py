@@ -3,7 +3,7 @@ from utils.math_utils import U_converged
 from utils.metrics import nmi_acc
 from numpy.linalg import norm as l21_norm
 
-m=5
+m=1.1
 
 def iteration(X, U, V, labels, p, logger):
     
@@ -14,12 +14,12 @@ def iteration(X, U, V, labels, p, logger):
     while True:
         V = update_V(X,U,V)
         new_U = update_U(X,V)
-        delta=l21_norm(U-new_U)
+        delta, converged = U_converged(new_U, U)
         print(delta)
         U = new_U
         metric_now = nmi_acc(U, labels)
         E_now = E(X,U,V)
-        if delta<tol:
+        if converged:
             break
         logger.log_middle(E_now, metric_now)
         t += 1
