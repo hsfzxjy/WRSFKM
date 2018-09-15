@@ -1,0 +1,12 @@
+{
+    "root_directory": "",
+    "init_params": {
+        "method": "random"
+    },
+    "dataset": "mnist_10k",
+    "mutual": {"gamma":0.1},
+    "params": {
+            "kmeans_random": {"iter_method": "afkm"}
+    },
+    "times": 1
+}
