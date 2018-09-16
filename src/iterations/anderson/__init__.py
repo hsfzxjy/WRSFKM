@@ -105,7 +105,7 @@ def iteration(X, U, V, labels, p, logger):
     epsilon = p.epsilon
     max_iteration = p.max_iterations or 300
 
-    V_old = update_V(V, U, X, epsilon)
+    # V_old = update_V(V, U, X, epsilon)
     U_new = U
 
     old_E = np.Infinity

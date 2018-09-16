@@ -12,6 +12,10 @@ def iteration(X, U, V, labels, p, logger):
     t = 0
     while True:
 
+        new_U = solve_U(X, V, gamma, epsilon)
+        _, converged = U_converged(new_U, U)
+        U = new_U
+
         delta_V = 100
 
         while delta_V > 1e-1:
@@ -21,10 +25,6 @@ def iteration(X, U, V, labels, p, logger):
 
             if not multi_V:
                 break
-
-        new_U = solve_U(X, V, gamma, epsilon)
-        _, converged = U_converged(new_U, U)
-        U = new_U
 
         metric_now = nmi_acc(U, labels)
         E_now = E(U, V, X, gamma, epsilon)

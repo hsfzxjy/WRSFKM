@@ -1,17 +1,22 @@
 {
     "root_directory": "",
     "init_params": {
-        "method": "kmpp"
+        "method": "random"
     },
     "mutual": {
-        "w_epsilon": 0.04
+        "w_epsilon": 0.15
     },
     "dataset": "mnist_10k",
     "params": {
         "orig_random": {
             "iter_method": "orig",
             "epsilon": 5,
-            "gamma": 0.04
+            "gamma": 0.05
+        },
+        "aa_random": {
+            "iter_method": "sv",
+            "epsilon": 0.15,
+            "gamma": 0.0666667
         }
     },
     "times": 1

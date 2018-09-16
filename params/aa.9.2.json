@@ -1,0 +1,16 @@
+{
+    "root_directory": "aa.9.2",
+    "init_params": {
+        "method": "kmpp"
+    },
+    "dataset": "mnist_10k",
+    "mutual": { "w_epsilon": 0.18 },
+    "params": {
+        "aa_random": {
+            "iter_method": "sv",
+            "epsilon": 0.18,
+            "gamma": 0.0617284
+        }
+    },
+    "times": 50
+}

@@ -46,8 +46,10 @@ class DualTester:
 
             dest = os.path.join(self.root_directory, name + '.h5.' + str(index)) if self.root_directory else ''
 
+            print('running', name)
             logger = Logger(dest)
             result = run(X, labels, p, logger)
+            print(name, result[2:])
             logger.log_final(*result)
             logger.close()
 
@@ -55,12 +57,25 @@ class DualTester:
 
     def execute(self):
 
-        import os
-        import multiprocessing.pool as mpp
+        # import os
+        # import multiprocessing.pool as mpp
 
-        pool = mpp.Pool(int(os.cpu_count() * .75))
+        # # pool = mpp.Pool(int(os.cpu_count() * .75))
 
-        pool.map(self.target, range(self.times))
+        # # pool.map(self.target, range(self.times))
+        #
+        from glob import glob
+
+        start_index = 0
+        for fn in glob(os.path.join(self.root_directory, '*.h5.*')):
+
+            x = int(fn.rpartition('.')[-1])
+            start_index = max(x, start_index)
+
+        start_index += 1
+
+        for i in range(start_index, start_index + self.times):
+            self.target(i)
 
 
 if __name__ == '__main__':

@@ -4,13 +4,13 @@
         "method": "random"
     },
     "mutual": {
+        "w_epsilon": 0.15
     },
     "dataset": "mnist_10k",
     "params": {
-        "aa_random": {
-            "iter_method": "aa",
-            "epsilon": 4.5,
-            "gamma": 0.00037037
+        "fkm_random": {
+            "iter_method": "fkm",
+            "m": 2
         }
     },
     "times": 1

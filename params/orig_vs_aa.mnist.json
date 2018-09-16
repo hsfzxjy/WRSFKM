@@ -1,5 +1,5 @@
 {
-    "root_directory": "",
+    "root_directory": "orig_vs_aa",
     "init_params": {
         "method": "kmpp"
     },
@@ -8,11 +8,16 @@
     },
     "dataset": "mnist_10k",
     "params": {
-        "sv_random": {
+        "orig_random": {
+            "iter_method": "orig",
+            "epsilon": 5,
+            "gamma": 0.05
+        },
+        "aa_random": {
             "iter_method": "sv",
             "epsilon": 0.17,
             "gamma": 0.0653595
         }
     },
-    "times": 1
+    "times": 200
 }

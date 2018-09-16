@@ -11,6 +11,7 @@ def iteration(X, U, V, labels, p, logger):
     C = len(V)
 
     gamma, epsilon = p.gamma, p.epsilon
+    capped = p.capped or True
 
     S = np.ones((N, C))
     t = 0
@@ -20,9 +21,9 @@ def iteration(X, U, V, labels, p, logger):
         print(delta)
         U = new_U
         V = update_V(S, U, X)
-        S = update_S(X, V, epsilon)
+        S = update_S(X, V, epsilon, capped)
         metric_now = nmi_acc(U, labels)
-        E_now = E(U, V, X, gamma, epsilon)
+        E_now = E(U, V, X, gamma, epsilon, capped)
         if converged:
             break
         logger.log_middle(E_now, metric_now)

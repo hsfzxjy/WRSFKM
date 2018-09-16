@@ -1,0 +1,83 @@
+#!/usr/bin/env python3
+
+import numpy as np
+from numba.pycc import CC
+from numba import njit
+from math import sqrt
+
+cc = CC('basics')
+
+
+@cc.export('distance', 'f8(f8[:], f8[:])')
+@njit(fastmath=True)
+def distance(x, y):
+
+    result = 0.
+
+    for i in range(x.shape[0]):
+        delta = x[i] - y[i]
+        result += delta * delta
+
+    return sqrt(result)
+
+
+@cc.export('sqrdistance', 'f8(f8[:], f8[:])')
+@njit(fastmath=True)
+def sqrdistance(x, y):
+
+    result = 0.
+
+    for i in range(x.shape[0]):
+        delta = x[i] - y[i]
+        result += delta * delta
+
+    return result
+
+
+@cc.export('update_U', '(f8[:,:], f8[:,:], i8)')
+@njit
+def update_U(X, V, m):
+    N = len(X)
+    C = len(V)
+    U = np.zeros((N, C), dtype=np.float64)
+    exponent = 2 / (m - 1)
+    for i in range(N):
+        for j in range(C):
+            he = 0.
+            xivj_norm = distance(X[i, :], V[j, :])
+            for k in range(C):
+                he = he + (xivj_norm / distance(X[i, :], V[k, :]))**exponent
+            U[i, j] = 1 / he
+    return U
+
+
+@cc.export('update_V', '(f8[:,:], f8[:,:], f8[:,:], i8)')
+@njit
+def update_V(X, U, V, m):
+    N = len(X)
+    C, ndim = V.shape
+    new_V = np.zeros(V.shape, dtype=np.float64)
+    for j in range(C):
+        fenzi = np.zeros((ndim,), dtype=np.float64)
+        fenmu = 0.
+        for i in range(N):
+            fenzi = fenzi + (U[i, j])**m * X[i, :]
+            fenmu = fenmu + (U[i, j])**m
+        new_V[j, :] = fenzi / fenmu
+    return new_V
+
+
+@cc.export('E', '(f8[:,:],f8[:,:],f8[:,:],i8)')
+@njit
+def E(X, U, V, m):
+    N = len(X)
+    C = len(V)
+    E = 0
+    for i in range(N):
+        for k in range(C):
+            E = E + U[i, k] ** m * sqrdistance(X[i, :], V[k, :])
+    return E
+
+
+if __name__ == '__main__':
+    cc.compile()
