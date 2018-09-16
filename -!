@@ -1,0 +1,14 @@
+ fot experiment
+# Please enter the commit message for your changes. Lines starting
+# with '#' will be ignored, and an empty message aborts the commit.
+#
+# On branch hu
+# Your branch is up to date with 'origin/hu'.
+#
+# Changes to be committed:
+#	new file:   params/fkm.json
+#	new file:   params/kmeans.json
+#	modified:   src/iterations/__init__.py
+#	new file:   src/iterations/fkm.py
+#	new file:   src/iterations/kmeans.py
+#
