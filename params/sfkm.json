@@ -1,16 +1,16 @@
 {
-    "root_directory": "fkm",
+    "root_directory": "sfkm",
     "init_params": {
-        "method": "kmpp"
+        "method": "random"
     },
     "mutual": {
         "w_epsilon": 0.15
     },
     "dataset": "mnist_10k",
     "params": {
-        "fkm_random": {
-            "iter_method": "fkm",
-            "m": 1.05
+        "sfkm_kmpp": {
+            "iter_method": "sfkm",
+            "gamma": 0.05
         }
     },
     "times": 100

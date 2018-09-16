@@ -22,6 +22,12 @@ def run(X, labels, p, logger):
         from iterations.orig import iteration
     elif iter_method == 'fkm':
         from iterations.fkm import iteration
+    elif iter_method == 'kmeans':
+        from iterations.kmeans import iteration
+    elif iter_method == 'afkm':
+        from iterations.afkm import iteration
+    elif iter_method == 'sfkm':
+        from iterations.sfkm import iteration
     else:
         raise RuntimeError('Unknown method.')
 

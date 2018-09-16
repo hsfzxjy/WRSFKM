@@ -3,9 +3,10 @@
 import numpy as np
 from numba.pycc import CC
 from numba import njit
-from math import sqrt
+from math import sqrt, exp, log
 
-cc = CC('basics')
+
+cc = CC('_numba')
 
 
 @cc.export('distance', 'f8(f8[:], f8[:])')
@@ -36,46 +37,48 @@ def sqrdistance(x, y):
 
 @cc.export('update_U', '(f8[:,:], f8[:,:], f8)')
 @njit
-def update_U(X, V, m):
+def update_U(X, V, gamma):
     N = len(X)
     C = len(V)
     U = np.zeros((N, C), dtype=np.float64)
-    exponent = 2 / (m - 1)
     for i in range(N):
-        for j in range(C):
-            he = 0.
-            xivj_norm = distance(X[i, :], V[j, :])
-            for k in range(C):
-                he = he + (xivj_norm / distance(X[i, :], V[k, :]))**exponent
-            U[i, j] = 1 / he
+
+        expdist = np.empty((C, ), dtype=np.float64)
+
+        for k in range(C):
+            expdist[k] = exp(-distance(X[i, :], V[k, :]) / gamma)
+
+        s = expdist.sum()
+        U[i, :] = expdist / s
+
     return U
 
 
 @cc.export('update_V', '(f8[:,:], f8[:,:], f8[:,:], f8)')
 @njit
-def update_V(X, U, V, m):
-    N = len(X)
-    C, ndim = V.shape
-    new_V = np.zeros(V.shape, dtype=np.float64)
+def update_V(X, U, V, gamma):
+    N, ndim = X.shape
+    C = len(V)
+    V = np.zeros(V.shape, dtype=np.float64)
     for j in range(C):
         fenzi = np.zeros((ndim,), dtype=np.float64)
-        fenmu = 0.
+        fenmu = 0
         for i in range(N):
-            fenzi = fenzi + (U[i, j])**m * X[i, :]
-            fenmu = fenmu + (U[i, j])**m
-        new_V[j, :] = fenzi / fenmu
-    return new_V
+            fenzi = fenzi + (U[i, j]) * X[i, :]
+            fenmu = fenmu + (U[i, j])
+        V[j, :] = fenzi / fenmu
+    return V
 
 
 @cc.export('E', '(f8[:,:],f8[:,:],f8[:,:], f8)')
 @njit
-def E(X, U, V, m):
+def E(X, U, V, gamma):
     N = len(X)
     C = len(V)
     E = 0
     for i in range(N):
         for k in range(C):
-            E = E + U[i, k] ** m * sqrdistance(X[i, :], V[k, :])
+            E = E + (U[i, k]) * distance(X[i, :], V[k, :]) + gamma * U[i, k] * log(U[i, k])
     return E
 
 

@@ -1,0 +1,17 @@
+{
+    "root_directory": "",
+    "init_params": {
+        "method": "random"
+    },
+    "mutual": {
+        "w_epsilon": 0.15
+    },
+    "dataset": "mnist_10k",
+    "params": {
+        "afkm_kmpp": {
+            "iter_method": "afkm",
+            "gamma": 0.1
+        }
+    },
+    "times": 1
+}
