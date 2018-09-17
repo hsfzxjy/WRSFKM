@@ -8,7 +8,7 @@ def iteration(X, U, V, labels, p, logger):
 
     from skfuzzy.cluster import cmeans
 
-    V, U, _, _, _, t, _ = cmeans(X.T, len(V), 1.05, 1e-1, 200)
+    V, U, _, _, _, t, _ = cmeans(X.T, len(V), 1.05, 1e-1, 200, U.T)
     metric_now = nmi_acc(U.T, labels)
 
     return U.T, V.T, t, metric_now
