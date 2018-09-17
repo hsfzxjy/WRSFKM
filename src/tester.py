@@ -34,13 +34,18 @@ class DualTester:
 
         U, V = init_uv(X, C, Params(dict(**self.init_params, **self.mutual)))
 
+        initial = {
+            name: (U.copy(), V.copy())
+            for name in self.params
+        }
+
         result = {}
 
         for name, param in self.params.items():
             p = Params({
                 **param,
                 **self.mutual,
-                'initial': (U, V),
+                'initial': initial[name],
                 'init': 'preset',
                 'C': C
             })

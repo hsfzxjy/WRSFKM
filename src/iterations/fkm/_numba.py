@@ -46,6 +46,7 @@ def update_U(X, V, m):
     for i in range(N):
         for j in range(C):
             dist[i, j] = distance(X[i, :], V[j, :]) ** exponent
+            print(dist[i, j], distance(X[i, :], V[j, :]))
 
     for i in range(N):
 
@@ -53,6 +54,7 @@ def update_U(X, V, m):
         for k in range(C):
             s = s + 1 / dist[i, k]
 
+        print(s)
         for j in range(C):
             U[i, j] = 1 / (dist[i, j] * s)
 

@@ -2,13 +2,14 @@ import numpy as np
 import os.path as osp
 from skimage.transform import resize
 
+import h5py
+
 
 resolve = lambda *parts: osp.join(osp.dirname(__file__), '..', '..', 'data', *parts)  # noqa
 
 
 def mnist_10k():
 
-    import h5py
     import mnist
     import numpy as np
     C = 10
@@ -50,6 +51,46 @@ def coil_20():
     reg = re.compile(r'/obj(\d+)')
 
     directory = resolve('coil-20')
+    classes = []
+    imgs = []
+
+    C = 20
+
+    h5fn = osp.join(directory, 'data.h5')
+    if osp.isfile(h5fn):
+        f = h5py.File(h5fn, 'r')
+        X = np.array(f.get('X'))
+        labels = np.array(f.get('labels'))
+
+        return X, C, labels
+
+    for fn in glob(resolve(directory, '*.png')):
+        class_ = int(reg.findall(fn)[0])
+        classes.append(class_)
+
+        img = resize(imread(fn, mode='L'), (16, 16)).flatten()
+        imgs.append(img)
+
+    X = np.array(imgs)
+    labels = np.array(classes)
+
+    f = h5py.File(h5fn, 'w')
+    f.create_dataset('X', data=X)
+    f.create_dataset('labels', data=labels)
+    f.close()
+
+    return X, C, labels
+
+
+def coil_100():
+
+    from scipy.misc import imread
+    from glob import glob
+    import re
+
+    reg = re.compile(r'/obj(\d+)')
+
+    directory = resolve('coil-100')
     classes = []
     imgs = []
 

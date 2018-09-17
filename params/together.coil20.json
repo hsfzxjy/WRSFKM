@@ -1,0 +1,37 @@
+{
+    "root_directory": "",
+    "init_params": {
+        "method": "kmpp"
+    },
+    "mutual": {
+    },
+    "dataset": "coil_20",
+    "params": {
+        "orig": {
+            "iter_method": "orig",
+            "epsilon": 10,
+            "gamma": 0.3
+        },
+        "afkm": {
+            "iter_method": "afkm",
+            "gamma": 0.1
+        },
+        "sfkm": {
+            "iter_method": "sfkm",
+            "gamma": 0.1
+        },
+        "kmeans": {
+            "iter_method": "kmeans"
+        },
+        "fkm": {
+            "iter_method": "fkm",
+            "m": 1.05
+        },
+        "aa": {
+            "iter_method": "sv",
+            "epsilon": 0.17,
+            "gamma": 0.0653595
+        }
+    },
+    "times": 1
+}
