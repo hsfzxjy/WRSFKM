@@ -85,8 +85,6 @@ def solve_huang_eq_13(v):
     lambda_star = (lambda_bar_star - u) + clip(u - lambda_bar_star)
     return u + lambda_star - lambda_bar_star * np.ones(n)
 
-#
-
 
 @cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8)')
 @njit(fastmath=True, parrallel=True)
@@ -143,12 +141,18 @@ def sqrdistance(x, y):
 def update_V(X, U, V, gamma):
     N, ndim = X.shape
     C = len(V)
+
+    Ut = U.T.copy()
+
     for j in range(C):
         fenzi = np.zeros((ndim,), dtype=np.float64)
         fenmu = 0
         for i in range(N):
-            fenzi = fenzi + (U[i, j]) * X[i, :]
-            fenmu = fenmu + (U[i, j])
+
+            Uij = Ut[j, i]
+
+            fenzi = fenzi + Uij * X[i, :]
+            fenmu = fenmu + Uij
         V[j, :] = fenzi / fenmu
     return V
 

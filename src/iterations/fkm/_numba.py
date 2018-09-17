@@ -5,7 +5,7 @@ from numba.pycc import CC
 from numba import njit
 from math import sqrt
 
-cc = CC('basics')
+cc = CC('_numba')
 
 
 @cc.export('distance', 'f8(f8[:], f8[:])')
@@ -45,14 +45,17 @@ def update_U(X, V, m):
     dist = np.zeros((N, C), dtype=np.float64)
     for i in range(N):
         for j in range(C):
-            dist[i, j] = distance(X[i, :], V[j, :])
+            dist[i, j] = distance(X[i, :], V[j, :]) ** exponent
 
     for i in range(N):
+
+        s = 0.
+        for k in range(C):
+            s = s + 1 / dist[i, k]
+
         for j in range(C):
-            he = 0.
-            for k in range(C):
-                he = he + (dist[i, j] / dist[i, k])**exponent
-            U[i, j] = 1 / he
+            U[i, j] = 1 / (dist[i, j] * s)
+
     return U
 
 

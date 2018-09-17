@@ -2,6 +2,7 @@
 
 import os
 import sys
+from time import time
 
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'utils'))
 
@@ -48,7 +49,11 @@ class DualTester:
 
             print('running', name)
             logger = Logger(dest)
+            start_time = time()
             result = run(X, labels, p, logger)
+            end_time = time()
+            time_elasped = end_time - start_time
+            result = (*result, time_elasped)
             print(name, result[2:])
             logger.log_final(*result)
             logger.close()

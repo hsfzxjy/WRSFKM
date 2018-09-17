@@ -18,7 +18,6 @@ def iteration(X, U, V, labels, p, logger):
     while True:
         new_U = solve_U(S, X, V, gamma)
         delta, converged = U_converged(new_U, U)
-        print(delta)
         U = new_U
         V = update_V(S, U, X)
         S = update_S(X, V, epsilon, capped)

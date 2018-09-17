@@ -26,14 +26,14 @@ class Logger:
 
         self.iterations += 1
 
-    def log_final(self, U, V, t, metric):
+    def log_final(self, U, V, t, metric, time):
 
         if self.group is None:
             print('result:', t, *metric)
         else:
             self.U = U
             self.V = V
-            self.result = (t, *metric)
+            self.result = (t, *metric, time)
 
     def close(self):
 

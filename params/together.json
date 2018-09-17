@@ -1,10 +1,9 @@
 {
     "root_directory": "together",
     "init_params": {
-        "method": "random"
+        "method": "kmpp"
     },
     "mutual": {
-        "w_epsilon": 0.15
     },
     "dataset": "mnist_10k",
     "params": {
@@ -22,7 +21,17 @@
         "fkm": {
             "iter_method": "fkm",
             "m": 1.05
+        },
+        "orig": {
+            "iter_method": "orig",
+            "epsilon": 5,
+            "gamma": 0.05
+        },
+        "aa": {
+            "iter_method": "sv",
+            "epsilon": 0.17,
+            "gamma": 0.0653595
         }
     },
-    "times": 100
+    "times": 200
 }

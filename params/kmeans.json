@@ -1,7 +1,7 @@
 {
     "root_directory": "kmeans",
     "init_params": {
-        "method": "random"
+        "method": "kmpp"
     },
     "mutual": {
         "w_epsilon": 0.15
@@ -12,5 +12,5 @@
             "iter_method": "kmeans"
         }
     },
-    "times": 100
+    "times": 1
 }

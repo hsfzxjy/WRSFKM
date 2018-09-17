@@ -11,7 +11,6 @@ def iteration(X, U, V, labels, p, logger):
     while True:
         new_U = update_U(X, V, gamma)
         delta, converged = U_converged(new_U, U)
-        print(delta)
         U = new_U
         metric_now = nmi_acc(U, labels)
         V = update_V(X, U, V, gamma)

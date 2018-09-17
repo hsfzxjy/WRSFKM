@@ -10,7 +10,7 @@
     "params": {
         "fkm_random": {
             "iter_method": "fkm",
-            "m": 2
+            "m": 1.05
         }
     },
     "times": 1

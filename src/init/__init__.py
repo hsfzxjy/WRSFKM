@@ -25,8 +25,8 @@ def init_uv(X, C, p):
         xi = np.repeat(X[i, :].reshape((1, ndim)), C, axis=0)
         U[i, np.argmin(l21_norm(xi - V, axis=1))] = .9
 
-    w_epsilon = p.w_epsilon
-    from basics.ours import update_V as ours_update_V
-    V = ours_update_V(V, U, X, w_epsilon)
+    # w_epsilon = p.w_epsilon
+    # from basics.ours import update_V as ours_update_V
+    # V = ours_update_V(V, U, X, w_epsilon)
 
     return U, V
