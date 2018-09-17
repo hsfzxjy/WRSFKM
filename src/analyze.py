@@ -47,7 +47,7 @@ class Group:
         if self._dataframe is not None:
             return self._dataframe
 
-        self._dataframe = pd.DataFrame([x.result for x in self.lst], columns=['step', 'nmi', 'acc'])
+        self._dataframe = pd.DataFrame([x.result for x in self.lst], columns=['step', 'nmi', 'acc', 'time'])
 
         return self._dataframe
 
@@ -56,7 +56,7 @@ class Group:
         dct = defaultdict(list)
 
         for item in self.lst[index].middle:
-            for i, name in enumerate(['E', 'nmi', 'acc']):
+            for i, name in enumerate(['E', 'nmi', 'acc', 'time']):
                 dct[name].append(item[i])
 
         # self._middle = self.lst[index].middle
@@ -109,7 +109,7 @@ class TestResult:
 
         dct = {}
 
-        for item_name in ['E', 'nmi', 'acc']:
+        for item_name in ['E', 'nmi', 'acc', 'time']:
 
             dfs = []
 
@@ -192,5 +192,7 @@ if __name__ == '__main__':
     df = result.dataframe
     print(df.loc['acc', :].describe())
     print(df.loc['nmi', :].describe())
+    print(df.loc['step', :].describe())
+    print(df.loc['time', :].describe())
     import IPython
     IPython.embed()
