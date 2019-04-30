@@ -3,7 +3,6 @@
 from math import exp
 
 import numpy as np
-from numpy.linalg import norm as l21_norm
 
 import numba
 from numba.pycc import CC
@@ -157,9 +156,9 @@ def sqrdistance(x, y):
     return result
 
 
-@cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8, f8)')
+@cc.export('solve_U', 'f8[:, :](f8[:,:], f8[:,:], f8[:,:], f8, f8)')
 @njit(fastmath=True, parrallel=True)
-def solve_U(x, v, gamma, epsilon):
+def solve_U(x, v, v_old, gamma, epsilon):
 
     N, C = len(x), len(v)
 
@@ -172,10 +171,12 @@ def solve_U(x, v, gamma, epsilon):
         h = np.empty(shape=(C,), dtype=np.float64)
         xi = x[i, :]
         for j in range(C):
-            h[j] = - sqr_welsch_func_scalar(sqrdistance(xi, v[j, :]), epsilon) / (2 * gamma)
+            xi_voldj_distance_sqr = sqrdistance(xi, v_old[j, :])
+            xi_vj_distance_sqr = sqrdistance(xi, v[j, :])
+            W_j = sqr_welsch_func_scalar(xi_voldj_distance_sqr, epsilon)
+            h[j] = W_j + (np.sqrt(xi_vj_distance_sqr) - np.sqrt(xi_voldj_distance_sqr)) * (1 - epsilon * W_j)
+            h[j] = -h[j] / (2 * gamma)
 
-        # h = - w / (2 * gamma)
-        # h = - sqr_welsch_func(w, epsilon) / (2 * gamma)
         U[i, :] = solve_huang_eq_13(h)
 
     return U
@@ -186,12 +187,6 @@ def solve_U(x, v, gamma, epsilon):
 def update_V(v, u, x, epsilon):
 
     N, C, ndim = len(x), len(v), len(x[0])  # noqa
-
-    # W = np.empty((C, N), dtype=np.float64)
-
-    # for i in range(N):
-    #     for k in range(C):
-    #         W[k, i] = u[i, k] * np.exp(-epsilon * l21_norm(x[i, :] - v[k, :])**2)
 
     new_v = np.zeros(v.shape, dtype=np.float64)
 
@@ -225,69 +220,6 @@ def update_V(v, u, x, epsilon):
     return new_v
 
 
-@cc.export('origin_solve_U', 'f8[:,:](f8[:,:],f8[:,:],f8,f8)')
-@njit
-def origin_solve_U(x, v, gamma, epsilon):
-
-    N, C, ndim = len(x), len(v), len(x[0])  # noqa
-
-    U = np.zeros((N, C))
-    for i in range(N):
-        # xi = np.repeat(x[i, :].reshape((1, ndim)), C, axis=0)
-        h = np.empty(shape=(C,), dtype=np.float64)
-        for j in range(C):
-            h[j] = l21_norm(x[i, :] - v[j, :])
-        # h = l21_norm(xi - v, axis=1)
-        h = (-h) / (4 * gamma * epsilon**0.5 / 0.63817562)
-        U[i, :] = solve_huang_eq_13(h)
-    return U
-
-
-@cc.export('origin_update_V', 'f8[:,:](f8[:,:],f8[:,:],f8[:,:])')
-@njit
-def origin_update_V(x, u, v):
-
-    N, C, ndim = len(x), len(v), len(x[0])  # noqa
-
-    V = np.zeros((C, ndim))
-    for k in range(C):
-        A = 0
-        vk = v[k, :]  # .reshape((1, ndim))
-        for i in range(N):
-            xi = x[i, :]  # .reshape((1, ndim))
-            V[k, :] = V[k, :] + 1 / (2 * l21_norm(xi - vk)) * u[i, k] * xi
-            A = A + 1 / (2 * l21_norm(xi - vk)) * u[i, k]
-        V[k, :] = V[k, :] / A
-    return V
-
-
-@cc.export('origin_init', '(f8[:,:], i8, f8, f8)')
-def origin_init(X, C, gamma, epsilon):
-
-    N, ndim = len(X), len(X[0])
-    size = N
-
-    V = np.empty((C, ndim), dtype=np.float64)
-
-    for i in range(C):
-        for k in range(ndim):
-            V[i, k] = np.random.random()
-
-    U = np.zeros((size, C))
-    t = 0
-    while True:
-        U = origin_solve_U(X, V, gamma, epsilon)
-        new_V = origin_update_V(X, U, V)
-        delta = l21_norm(new_V - V)
-        V = new_V
-        print('init t =', t)
-        if delta < 1e-1:
-            break
-        t += 1
-
-    return U, V
-
-
 @cc.export('E', 'f8(f8[:,:],f8[:,:],f8[:,:],f8,f8)')
 @njit(parrallel=True)
 def E(U, V, X, gamma, epsilon):
@@ -301,17 +233,6 @@ def E(U, V, X, gamma, epsilon):
             term1 += U[i, k] * sqr_welsch_func_scalar(sqrdistance(xi, V[k, :]), epsilon)
 
     return term1 + gamma * sqrnorm_2d(U)
-
-
-# @cc.export('U_converged', '(f8[:, :], f8[:, :])')
-# @njit
-# def U_converged(old, new):
-
-#     tol = 1e-1
-
-#     delta = l21_norm(old - new)
-
-#     return delta, delta < tol
 
 
 if __name__ == '__main__':

@@ -209,23 +209,23 @@ def run(X, C, labels, *, logger=None, init=None, multi_V=False):
     return t, NMI(U, labels)
 
 
-# if __name__ == '__main__':
+if __name__ == '__main__':
 
-#     images, labels = mndata.load_testing()
+    images, labels = mndata.load_testing()
 
-#     import argparse
-#     parser = argparse.ArgumentParser()
-#     parser.add_argument('action')
-#     action = parser.parse_args().action
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('action')
+    action = parser.parse_args().action
 
-#     if action == 'test':
-#         for i in range(200):
-#             U, V = init_uv(X)
-#             print('testing', i)
-#             fn = 'v3_log_kmpp/{}.log'.format(i)
-#             t1, nmi1 = run_new(fn)
-#             t2, nmi2 = run_old(fn)
+    if action == 'test':
+        for i in range(200):
+            U, V = init_uv(X)
+            print('testing', i)
+            fn = 'v3_log_kmpp/{}.log'.format(i)
+            t1, nmi1 = run_new(fn)
+            t2, nmi2 = run_old(fn)
 
-#             with open('v3_log_kmpp/{}.stat'.format(i), 'w') as f:
-#                 print(t1, nmi1, file=f)
-#                 print(t2, nmi2, file=f)
+            with open('v3_log_kmpp/{}.stat'.format(i), 'w') as f:
+                print(t1, nmi1, file=f)
+                print(t2, nmi2, file=f)

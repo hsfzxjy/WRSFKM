@@ -4,7 +4,7 @@
         "method": "random"
     },
     "dataset": "mnist_10k",
-    "mutual": {"epsilon": 30, "gamma": 0.001},
+    "mutual": {"epsilon": 1.5, "gamma": 0.5},
     "params": {
             "orig_random": {"iter_method": "orig"}
     },

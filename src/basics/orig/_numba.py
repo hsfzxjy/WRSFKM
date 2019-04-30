@@ -131,7 +131,7 @@ def sqrdistance(x, y):
 
 
 @cc.export('distance', 'f8(f8[:], f8[:])')
-@njit(fastmath=True)
+@njit
 def distance(x, y):
 
     result = 0.
@@ -176,6 +176,8 @@ def update_V(s, u, x):
 
     su = (s * u).transpose()
 
+    EPS = 1e-12
+
     for k in range(C):
 
         sum_ = 0.
@@ -185,35 +187,37 @@ def update_V(s, u, x):
             w = su[k, i]
             vec_ = vec_ + w * x[i, :]
             sum_ = sum_ + w
+        # if abs(sum_) < EPS:
+        #     sum_ = EPS
+        # print(sum_)
 
         v[k, :] = vec_ / sum_
 
     return v
 
 
-@cc.export('update_S', '(f8[:, :], f8[:, :], f8, b1)')
+@cc.export('update_S', 'f8[:, :](f8[:, :], f8[:, :], f8, b1)')
 @njit
 def update_S(x, v, epsilon, capped):
 
     N = len(x)
     C = len(v)
 
-    s = np.zeros((N, C), dtype=np.float64)
-
-    if not capped:
-        for i in range(N):
-            for k in range(C):
-                norm_ = distance(x[i, :], v[k, :])
-                s[i, k] = norm_
-    else:
-        for i in range(N):
-            for k in range(C):
-                norm_ = distance(x[i, :], v[k, :])
-                if norm_ < epsilon:
-                    s[i, k] = 1 / (2 * norm_)
-                # else:
-                #     # print('fuck')
-                #     s[i, k] = 0
+    s = np.ones((N, C), dtype=np.float64)
+    # print(capped)
+    # if not capped:
+    #     for i in range(N):
+    #         for k in range(C):
+    #             norm_ = distance(x[i, :], v[k, :])
+    #             s[i, k] = 1 / (2 * norm_)
+    # else:
+    for i in range(N):
+        for k in range(C):
+            norm_ = distance(x[i, :], v[k, :])
+            if norm_ < epsilon:
+                s[i, k] = 1 / (2 * norm_)
+            else:
+                s[i, k] = 1e-16
 
     return s
 

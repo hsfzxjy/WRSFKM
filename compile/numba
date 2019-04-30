@@ -4,7 +4,7 @@ DIR=$(dirname $0)/..
 
 python3 $DIR/src/basics/ours/_numba.py
 python3 $DIR/src/basics/orig/_numba.py
-python3 $DIR/src/iterations/kmeans/_numba.py
-python3 $DIR/src/iterations/fkm/_numba.py
-python3 $DIR/src/iterations/sfkm/_numba.py
-python3 $DIR/src/iterations/afkm/_numba.py
+# python3 $DIR/src/iterations/kmeans/_numba.py
+# python3 $DIR/src/iterations/fkm/_numba.py
+# python3 $DIR/src/iterations/sfkm/_numba.py
+# python3 $DIR/src/iterations/afkm/_numba.py

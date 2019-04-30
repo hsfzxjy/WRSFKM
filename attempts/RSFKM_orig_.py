@@ -17,18 +17,9 @@ import numpy as np
 from numpy.linalg import norm as l21_norm
 from sklearn.metrics.cluster import normalized_mutual_info_score as nmi
 import os
-
-import argparse
-
-parser = argparse.ArgumentParser()
-parser.add_argument('--gamma', type=float)
-parser.add_argument('--epsilon', type=float)
-parser.add_argument('--seed', type=int)
-args = parser.parse_args()
-
-gamma = args.gamma
-epsilon = args.epsilon
-np.random.seed(args.seed)
+gamma = .1
+epsilon = 30
+np.random.seed(int(os.environ.get('seed', '42')))
 # Download t10k_* from http://yann.lecun.com/exdb/mnist/
 # Change to directory containing unzipped MNIST data
 mndata = mnist.MNIST('/home/hsfzxjy/srcs/RSFKM/data/MNIST-10K/')
@@ -88,13 +79,8 @@ def update_V(s, u, x):
 
     su = s * u
 
-    EPS = 1e-16
-
     for k in range(C):
-        su_k = su[:, k]
-        # su_k[abs(su_k) < EPS] = EPS
-        # print(su_k.sum())
-        v[k, :] = np.average(x, axis=0, weights=su_k)
+        v[k, :] = np.average(x, axis=0, weights=su[:, k])
 
     return v
 
@@ -109,7 +95,7 @@ def update_S(x, v, epsilon, capped):
             if norm_ < epsilon:
                 s[i, k] = 1 / (2 * norm_)
             else:
-                s[i, k] = 1e-16
+                s[i, k] = 0
 
     return s
 
@@ -140,7 +126,41 @@ def search_U(S, X, V, gammas=(.005,)):
 
 ndim = size = C = 0
 
-from basics.orig._numba import E
+from basics.orig._numba import solve_U, update_V, update_S
+
+
+def orig(X, U, V, error, gamma=gamma):
+
+    global ndim, size, C
+
+    ndim = len(X[0])
+    size = len(X)
+    C = len(V)
+
+    S = np.ones((size, C))
+    t = 1
+
+    while True:
+        print('--- ORIG ---')
+        print('== t = ', t)
+        new_U = solve_U(S, X, V, gamma)
+        delta = l21_norm(U - new_U)
+
+        U = new_U
+        old_V = V
+        V = update_V(S, U, X)
+        print('DELTA V', l21_norm(V - old_V))
+        S = update_S(X, V, epsilon, True)
+        # print('NMI', NMI(U))
+
+        print('DELTA', delta)
+        if delta < error and t != 1:
+            print('Converged at step', t)
+            break
+
+        t += 1
+
+    return U, V
 
 
 if __name__ == '__main__':
@@ -149,6 +169,7 @@ if __name__ == '__main__':
     size = len(labels)
     C = 10
     X = np.array(images).reshape((size, ndim)) / 255
+    print(np.linalg.norm(X, axis=1))
 
     t = 0
     V = np.random.random((C, ndim))
@@ -158,7 +179,7 @@ if __name__ == '__main__':
         xi = np.repeat(X[i, :].reshape((1, ndim)), C, axis=0)
         U[i, np.argmax(l21_norm(xi - V, axis=1))] = 1
 
-    S = np.ones((size, C), dtype=np.float64)
+    S = np.ones((size, C))
 
     while True:
         print('-------------')
@@ -175,7 +196,6 @@ if __name__ == '__main__':
         S = update_S(X, V, epsilon, True)
         print('DELTA S', l21_norm(S - old_S))
         print('NMI', NMI(U))
-        print('LOSS', E(U, V, X, gamma, epsilon, True))
 
         if delta < 1e-1:
             print('Converged at step', t)
